@@ -83,7 +83,7 @@ const Bookings = () => {
     return (
         <SafeAreaView style={styles.container}>
             <ScrollView contentContainerStyle={styles.scrollContainer}>
-                <View style={styles.content}>
+                <View>
                     <View style={styles.buttonContainer}>
                         <TouchableOpacity style={styles.addButton} onPress={addMatch}>
                             <Text style={styles.ButtonText}>Add Match</Text>
@@ -125,13 +125,10 @@ const styles = StyleSheet.create({
         backgroundColor: 'white',
     },
     buttonContainer: {
-        padding: 20,
+        padding: 10,
     },
     scrollContainer: {
         paddingBottom: 20,
-    },
-    content: {
-        flex: 1,
     },
     header: {
         paddingLeft: 10,
@@ -158,7 +155,6 @@ const styles = StyleSheet.create({
         elevation: 5,
         borderRadius: 50,
         paddingVertical: 12,
-        marginTop: 10,
     },
     ButtonText: {
         textAlign: 'center',

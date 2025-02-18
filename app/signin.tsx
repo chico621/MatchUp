@@ -20,20 +20,22 @@ const SignIn = () => {
                     password: password,
                 }
             });
+            const { token, user } = response.data;
 
-
-            // If login is successful, the JWT is then stored in memory
-            const token = response.data.token;
+            // Store token and user info
             await AsyncStorage.setItem('authToken', token);
+            await AsyncStorage.setItem('user', JSON.stringify(user));
+            await AsyncStorage.setItem('userID', user._id);
+
             console.log('Logged in successfully, token:', token);
             router.back();
-
 
         } catch (error) {
             setErrorMessage('Invalid username or password.');
             console.log('Login error:', error);
         }
     };
+
 
     return (
         <SafeAreaView className="bg-white h-full">
