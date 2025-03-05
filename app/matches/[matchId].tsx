@@ -1,5 +1,5 @@
 import { useLocalSearchParams } from "expo-router";
-import { View, TouchableOpacity, Text, StyleSheet, ActivityIndicator } from "react-native";
+import { Image, View, TouchableOpacity, Text, StyleSheet, ActivityIndicator } from "react-native";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { backButton, deleteMatch } from "../apiFunctions";
@@ -8,6 +8,8 @@ const MatchDetails = () => {
     const { matchId } = useLocalSearchParams(); // Extract matchId from URL params
     const [match, setMatch] = useState<any | null>(null);
     const [loading, setLoading] = useState(true);
+
+    const GOOGLE_MAPS_API_KEY = "AIzaSyAJlWtIahYjVCF3ti2cKfpYsPRRprMMmsY";
 
     useEffect(() => {
         if (!matchId || typeof matchId !== 'string') {
@@ -51,6 +53,12 @@ const MatchDetails = () => {
         );
     }
 
+    const staticMapUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${encodeURIComponent(
+        match.location
+    )}&zoom=15&size=600x300&maptype=roadmap&markers=color:red%7Clabel:S%7C${encodeURIComponent(
+        match.location
+    )}&key=${GOOGLE_MAPS_API_KEY}`;
+
     return (
         <View style={styles.matchCard}>
             <TouchableOpacity style={styles.backButton} onPress={backButton}>
@@ -60,6 +68,13 @@ const MatchDetails = () => {
             <Text>{`Date: ${match.match_date}`}</Text>
             <Text>{`Time: ${match.match_time}`}</Text>
             <Text>{`Location: ${match.location}`}</Text>
+
+            {/* Google Maps API*/}
+            <Image
+                source={{ uri: staticMapUrl }}
+                style={{ width: '100%', height: 200, marginVertical: 10 }}
+            />
+
             <TouchableOpacity
                 className="bg-white shadow-md shadow-zinc-300 rounded-full w-full py-4 mt-5">
                 <Text className="text-center text-black font-bold">Join</Text>
@@ -110,6 +125,16 @@ const styles = StyleSheet.create({
         shadowRadius: 3,
         justifyContent: 'center',
         alignItems: 'center',
+    },
+    googleMaps: {
+        marginVertical: 10,
+        borderRadius: 10,
+        overflow: 'hidden',
+        backgroundColor: 'black',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
+        shadowRadius: 3,
     }
 });
 

@@ -38,7 +38,16 @@ const Profile = () => {
             fetchUserData();
             fetchUserID();
         }
+
     }, [isFocused]);
+
+    const addTeam = () => {
+        router.push("../teams/newTeam");
+    };
+
+    const JoinTeam = () => {
+        router.push("../teams/JoinTeam");
+    };
 
     const handleLogout = async () => {
         try {
@@ -88,6 +97,20 @@ const Profile = () => {
                     <Text style={styles.userDetailText}>Username: {user.username}</Text>
                     <Text style={styles.userDetailText}>Name: {user.name}</Text>
                     <Text style={styles.userDetailText}>Email: {user.email}</Text>
+                </View>
+            </View>
+
+            <Text style={styles.profileTitle}>Teams</Text>
+
+            <View style={styles.userDetailsContainer}>
+                <View style={styles.userDetailCard}>
+                    <Text style={styles.userDetailText}>Current Team: {user.team_id}</Text>
+                    <TouchableOpacity style={styles.addButton} onPress={addTeam}>
+                        <Text style={styles.ButtonText}>Create new team</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.addButton} onPress={JoinTeam}>
+                        <Text style={styles.ButtonText}>Join a team</Text>
+                    </TouchableOpacity>
                 </View>
             </View>
 
@@ -152,6 +175,21 @@ const styles = StyleSheet.create({
         color: 'Black',
         fontSize: 18,
         fontWeight: '600',
+    }, addButton: {
+        backgroundColor: 'white',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.5,
+        elevation: 5,
+        borderRadius: 50,
+        paddingVertical: 12,
+        margin: 5,
+    },
+    ButtonText: {
+        textAlign: 'center',
+        fontSize: 16,
+        fontWeight: 'bold',
     },
 });
 
