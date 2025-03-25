@@ -1,12 +1,15 @@
 import { useLocalSearchParams } from "expo-router";
-import { Image, View, TouchableOpacity, Text, StyleSheet, ActivityIndicator } from "react-native";
+import { Image, View, TouchableOpacity, Text, Alert, StyleSheet, ActivityIndicator } from "react-native";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { backButton, deleteMatch } from "../apiFunctions";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const MatchDetails = () => {
     const { matchId } = useLocalSearchParams(); // Extract matchId from URL params
     const [match, setMatch] = useState<any | null>(null);
+    const [user, setUser] = useState<any>(null);
+    const [userID, setUserID] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
 
     const GOOGLE_MAPS_API_KEY = "AIzaSyAJlWtIahYjVCF3ti2cKfpYsPRRprMMmsY";
@@ -16,6 +19,20 @@ const MatchDetails = () => {
             setLoading(false);
             return;
         }
+
+        const fetchUserData = async () => {
+            try {
+                const userData = await AsyncStorage.getItem('user');
+                if (userData) {
+                    setUser(JSON.parse(userData));
+                }
+            } catch (error) {
+                console.log('Error fetching user data:', error);
+                Alert.alert('Error', 'There was an issue loading your profile data.');
+            }
+        };
+
+        fetchUserData();
 
         // Ensure the matchId is a 24-character string before making the request
         if (matchId.length !== 24) {
@@ -59,6 +76,31 @@ const MatchDetails = () => {
         match.location
     )}&key=${GOOGLE_MAPS_API_KEY}`;
 
+    const joinMatch = async () => {
+        if (!user || !user.team_id) {
+            alert("Team ID not found!");
+            return;
+        }
+
+        try {
+
+            const response = await axios.put(
+                `http://192.168.0.160:5000/api/v1.0/matches/${matchId}`,
+                { team_id: user.team_id } // Send the user's team ID
+            );
+
+            if (response.status === 200) {
+                alert("Successfully joined the match!");
+            } else {
+                alert("Failed to join the match.");
+            }
+        } catch (error) {
+            alert("An error occurred while joining the match.");
+            console.error(error);
+        }
+    };
+
+
     return (
         <View style={styles.matchCard}>
             <TouchableOpacity style={styles.backButton} onPress={backButton}>
@@ -69,21 +111,24 @@ const MatchDetails = () => {
             <Text>{`Time: ${match.match_time}`}</Text>
             <Text>{`Location: ${match.location}`}</Text>
 
-            {/* Google Maps API*/}
+            {/* Google Maps API */}
             <Image
                 source={{ uri: staticMapUrl }}
                 style={{ width: '100%', height: 200, marginVertical: 10 }}
             />
 
             <TouchableOpacity
-                className="bg-white shadow-md shadow-zinc-300 rounded-full w-full py-4 mt-5">
-                <Text className="text-center text-black font-bold">Join</Text>
+                style={styles.joinButton}
+                onPress={joinMatch}
+            >
+                <Text style={styles.ButtonText}>Join</Text>
             </TouchableOpacity>
+
             <TouchableOpacity
-                className="bg-white shadow-md shadow-zinc-300 rounded-full w-full py-4 mt-5"
+                style={styles.deleteButton}
                 onPress={() => deleteMatch(match._id)}
             >
-                <Text className="text-center text-black font-bold">Delete</Text>
+                <Text style={styles.ButtonText}>Delete</Text>
             </TouchableOpacity>
         </View>
     );
@@ -126,16 +171,34 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
-    googleMaps: {
-        marginVertical: 10,
-        borderRadius: 10,
-        overflow: 'hidden',
-        backgroundColor: 'black',
+    joinButton: {
+        backgroundColor: 'white',
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.2,
-        shadowRadius: 3,
-    }
+        shadowOpacity: 0.25,
+        shadowRadius: 3.5,
+        elevation: 5,
+        borderRadius: 50,
+        paddingVertical: 12,
+        marginTop: 20,
+    },
+    deleteButton: {
+        backgroundColor: 'white',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.5,
+        elevation: 5,
+        borderRadius: 50,
+        paddingVertical: 12,
+        marginTop: 10,
+    },
+    ButtonText: {
+        textAlign: 'center',
+        fontSize: 16,
+        fontWeight: 'bold',
+    },
 });
 
-export default MatchDetails;
+export default
+    MatchDetails;

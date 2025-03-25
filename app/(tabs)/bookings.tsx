@@ -1,10 +1,13 @@
-import { View, Text, ScrollView, SafeAreaView, StyleSheet, TouchableOpacity } from 'react-native';
 import React, { useState, useEffect } from 'react';
+import { View, Text, ScrollView, SafeAreaView, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { useRouter } from 'expo-router';
 
 const Bookings = () => {
     const [matches, setMatches] = useState<any[]>([]); // Store matches
+    const [isAdmin, setIsAdmin] = useState<boolean>(false); // Admin status
+    const router = useRouter();
 
     // Fetch matches
     const fetchMatches = () => {
@@ -17,38 +20,20 @@ const Bookings = () => {
             });
     };
 
-    // Function to add a match
-    { /* const addMatch = () => {
-        const formData = new URLSearchParams();
-        formData.append('date', '2025-01-23'); // Replace with dynamic values
-        formData.append('time', '14:00'); // Replace with dynamic values
-        formData.append('location', 'Stadium A'); // Replace with dynamic values
-
-        axios.post('http://192.168.0.160:5000/api/v1.0/matches', formData, {
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
+    // Fetch user info (including admin status)
+    const fetchUserInfo = async () => {
+        try {
+            const userInfo = await AsyncStorage.getItem('user');
+            if (userInfo) {
+                const parsedUser = JSON.parse(userInfo);
+                setIsAdmin(parsedUser.admin); // Assuming the 'admin' field is stored as a boolean
             }
-        })
-            .then(response => {
-                if (response.status === 201) {
-                    alert('Match added successfully!');
-                    fetchMatches();
-                }
-            })
-            .catch(error => {
-                console.error('Error adding match:', error);
-                alert('Failed to add match.');
-            });
-        fetchMatches();
-    }; */}
-
-    const addMatch = () => {
-        router.push("../matches/newMatch");
+        } catch (error) {
+            console.error('Error fetching user info:', error);
+        }
     };
 
     // Fetch the selected match
-    const router = useRouter();
-
     const fetchMatch = (matchId: string) => {
         axios.get(`http://192.168.0.160:5000/api/v1.0/matches/${matchId}`)
             .then(response => {
@@ -59,25 +44,24 @@ const Bookings = () => {
             });
     };
 
-
     // Function to delete a match
     const deleteMatch = (matchId: string) => {
         axios.delete(`http://192.168.0.160:5000/api/v1.0/matches/${matchId}`)
             .then(response => {
                 if (response.status === 204) {
-                    alert('Match deleted successfully!');
+                    Alert.alert('Match deleted successfully!');
                     fetchMatches(); // Refresh the list after deletion
                 }
             })
             .catch(error => {
                 console.error('Error deleting match:', error);
-                alert('Failed to delete match.');
+                Alert.alert('Failed to delete match.');
             });
     };
 
-    //Fetches match when app is started
     useEffect(() => {
-        fetchMatches();
+        fetchMatches(); // Fetch matches
+        fetchUserInfo(); // Fetch user info (admin status)
     }, []);
 
     return (
@@ -85,34 +69,31 @@ const Bookings = () => {
             <ScrollView contentContainerStyle={styles.scrollContainer}>
                 <View>
                     <View style={styles.buttonContainer}>
-                        <TouchableOpacity style={styles.addButton} onPress={addMatch}>
+                        <TouchableOpacity style={styles.addButton} onPress={() => router.push("../matches/newMatch")}>
                             <Text style={styles.ButtonText}>Add Match</Text>
                         </TouchableOpacity>
                     </View>
 
-                    <>
-                        <Text style={styles.header}>Matches:</Text>
-                        {matches.map((match: any) => (
-                            <TouchableOpacity key={match._id} onPress={() => fetchMatch(match._id)}>
-                                <View style={styles.matchCard}>
-                                    <Text>{`Team ${match.team1_id} v Team ${match.team2_id}`}</Text>
-                                    <Text>{`Date: ${match.match_date}`}</Text>
-                                    <Text>{`Time: ${match.match_time}`}</Text>
-                                    <Text>{`Location: ${match.location}`}</Text>
+                    <Text style={styles.header}>Matches:</Text>
+                    {matches.map((match: any) => (
+                        <TouchableOpacity key={match._id} onPress={() => fetchMatch(match._id)}>
+                            <View style={styles.matchCard}>
+                                <Text>{`Team ${match.team1_id} v Team ${match.team2_id}`}</Text>
+                                <Text>{`Date: ${match.match_date}`}</Text>
+                                <Text>{`Time: ${match.match_time}`}</Text>
+                                <Text>{`Location: ${match.location}`}</Text>
+
+                                {/* Only show Delete button if user is admin */}
+                                {isAdmin && (
                                     <TouchableOpacity
-                                        className="bg-white shadow-md shadow-zinc-300 rounded-full w-full py-4 mt-5">
-                                        <Text style={styles.ButtonText}>Join</Text>
-                                    </TouchableOpacity>
-                                    <TouchableOpacity
-                                        className="bg-white shadow-md shadow-zinc-300 rounded-full w-full py-4 mt-5"
-                                        onPress={() => deleteMatch(match._id)}
-                                    >
+                                        style={styles.button}
+                                        onPress={() => deleteMatch(match._id)}>
                                         <Text style={styles.ButtonText}>Delete</Text>
                                     </TouchableOpacity>
-                                </View>
-                            </TouchableOpacity>
-                        ))}
-                    </>
+                                )}
+                            </View>
+                        </TouchableOpacity>
+                    ))}
                 </View>
             </ScrollView>
         </SafeAreaView>
@@ -161,10 +142,12 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: 'bold',
     },
-    matchDetails: {
-        padding: 20,
-        backgroundColor: '#f0f0f0',
+    button: {
+        backgroundColor: '#ff4d4d',
+        paddingVertical: 10,
+        paddingHorizontal: 20,
         borderRadius: 8,
+        marginTop: 10,
     },
 });
 

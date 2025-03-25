@@ -10,17 +10,20 @@ const NewTeam = () => {
     const [teamName, setTeamName] = useState('');
     const [userID, setUserID] = useState<string | null>(null);
 
-    const fetchUserID = async () => {
-        try {
-            const storedUserID = await AsyncStorage.getItem('userID');
-            if (storedUserID) {
-                setUserID(storedUserID);
-            } else {
+    useEffect(() => {
+        const fetchUserID = async () => {
+            try {
+                const storedUserID = await AsyncStorage.getItem('userID');
+                if (storedUserID) {
+                    setUserID(storedUserID);
+                }
+            } catch (error) {
+                console.error('Error fetching userID from AsyncStorage:', error);
             }
-        } catch (error) {
-            console.error('Error fetching userID from AsyncStorage:', error);
-        }
-    };
+        };
+
+        fetchUserID();
+    }, []);
 
     const submitTeam = async () => {
         if (!teamName) {
@@ -28,14 +31,10 @@ const NewTeam = () => {
             return;
         }
 
-        await fetchUserID(); // Wait until userID is fetched
-
         if (!userID) {
             alert("User ID not found!");
             return;
         }
-
-        const managerId = userID;
 
         try {
             const token = await AsyncStorage.getItem('authToken');
@@ -44,10 +43,9 @@ const NewTeam = () => {
                 return;
             }
 
-
             const formData = new URLSearchParams();
             formData.append('team_name', teamName);
-            formData.append('manager_id', managerId);
+            formData.append('user_id', userID); // Using stored userID
             formData.append('players', JSON.stringify([]));
 
             const response = await axios.post('http://192.168.0.160:5000/api/v1.0/teams', formData, {
@@ -65,14 +63,6 @@ const NewTeam = () => {
             alert('An error occurred while creating the team.');
         }
     };
-
-
-
-    useEffect(() => {
-        fetchUserID();
-    }, []);
-
-
 
     return (
         <SafeAreaView style={styles.container}>

@@ -37,9 +37,20 @@ const SignUpScreen = () => {
                 router.replace('../signin');
             }
         } catch (error) {
-            Alert.alert('Error', 'Failed to sign up. Please try again.');
+            if (axios.isAxiosError(error) && error.response) {
+                // If it's an Axios error and has a response, show the backend error message
+                Alert.alert('Error', error.response.data.error || 'Something went wrong');
+            } else if (error instanceof Error) {
+                // If it's a standard JS error, show its message
+                Alert.alert('Error', error.message);
+            } else {
+                // If it's an unknown type of error, show a generic message
+                Alert.alert('Error', 'Failed to sign up. Please try again.');
+            }
+
         }
     };
+
 
 
 

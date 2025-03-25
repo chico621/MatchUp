@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, ActivityIndicator, StyleSheet, ScrollView } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
+import { useRouter } from 'expo-router';
 
 const Messages = () => {
     const [userID, setUserID] = useState<string | null>(null);
     const [conversations, setConversations] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const router = useRouter();
 
     // Fetch userID from AsyncStorage
     useEffect(() => {
@@ -30,7 +32,7 @@ const Messages = () => {
         fetchUserID();
     }, []);
 
-    // Fetch conversations by using the userID of logged in user
+    // Fetch conversations by using the userID of the logged-in user
     useEffect(() => {
         const fetchConversations = async () => {
             if (userID) {
@@ -59,6 +61,14 @@ const Messages = () => {
         }
     }, [userID]);
 
+    const fetchConversation = (conversationId: string) => {
+        if (conversationId) {
+            router.push(`../conversations/${conversationId}`);
+        } else {
+            console.error('Conversation ID is undefined');
+        }
+    };
+
     if (loading) {
         return <ActivityIndicator size="large" color="#0000ff" />;
     }
@@ -81,17 +91,21 @@ const Messages = () => {
                         );
 
                         return (
-                            <View key={item.conversation_id} style={styles.conversationItem}>
-                                <Text style={styles.conversationTitle}>
-                                    {participants}
-                                </Text>
-                                <Text style={styles.conversationDate}>
-                                    Last updated: {item.last_updated_at}
-                                </Text>
-                                <Text style={styles.messagePreview}>
-                                    {item.messages.length > 0 ? item.messages[0].message_text : 'No messages yet'}
-                                </Text>
-                            </View>
+                            <TouchableOpacity key={item.conversation_id} onPress={() => fetchConversation(item.conversation_id)}>
+                                <View style={styles.conversationItem}>
+                                    <Text style={styles.conversationTitle}>
+                                        {participants.join(', ')}
+                                    </Text>
+                                    <Text style={styles.conversationDate}>
+                                        Last updated: {item.last_updated_at}
+                                    </Text>
+                                    <Text style={styles.messagePreview}>
+                                        {item.messages.length > 0
+                                            ? item.messages[0].message_text
+                                            : 'No messages yet'}
+                                    </Text>
+                                </View>
+                            </TouchableOpacity>
                         );
                     })}
                 </ScrollView>
