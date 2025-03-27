@@ -119,16 +119,17 @@ const Messages = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: 'white',
+        backgroundColor: '#424242',
     },
     header: {
         marginTop: 50,
         padding: 10,
         fontSize: 25,
         fontWeight: 'bold',
+        color: '#fff',
     },
     conversationItem: {
-        backgroundColor: '#fff',
+        backgroundColor: '#585858',
         padding: 10,
         margin: 5,
         borderRadius: 8,
@@ -141,20 +142,21 @@ const styles = StyleSheet.create({
     conversationTitle: {
         fontSize: 18,
         fontWeight: 'bold',
+        color: '#fff',
     },
     conversationDate: {
         fontSize: 14,
-        color: '#555',
+        color: '#560',
     },
     messagePreview: {
         fontSize: 16,
-        color: '#888',
+        color: 'black',
     },
     addButton: {
         width: 30,
         height: 30,
         borderRadius: 20,
-        backgroundColor: 'white',
+        backgroundColor: '#7f7f7f',
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.2,

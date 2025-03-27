@@ -1,62 +1,120 @@
-import { Text, View, TouchableOpacity, StyleSheet } from "react-native";
+import { Text, View, TouchableOpacity, StyleSheet, Image } from "react-native";
 import { Link } from "expo-router";
-import { Ionicons } from "@expo/vector-icons"; // Import icons
+import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient"; // Import gradient
 
 export default function Index() {
   return (
     <View style={styles.container}>
-      {/* Top Section with Title and Sign In */}
+      {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.title}>MatchUp</Text>
+        <Text style={styles.title}>
+          Match<Text style={styles.titleUp}>Up</Text>
+        </Text>
 
         <Link href="/signin" asChild>
-          <TouchableOpacity style={styles.loginContainer}>
-            <Text style={styles.loginText}>Login / Register</Text>
-            <Ionicons name="log-in-outline" size={24} color="black" />
+          <TouchableOpacity style={styles.loginButton}>
+            <Text style={styles.loginText}>Login</Text>
+            <Ionicons name="log-in-outline" size={22} color="white" />
           </TouchableOpacity>
         </Link>
+      </View>
+
+      {/* Image Section */}
+      <View style={styles.imageContainer}>
+        <Image
+          source={require("../../assets/images/handshake.jpg")}
+          style={styles.image}
+        />
+
+        {/* Fading Effect on Image */}
+        <LinearGradient
+          colors={["transparent", "#424242"]}
+          style={styles.gradient}
+        />
+      </View>
+
+      {/* Main Body Containing Text */}
+      <View style={styles.textContainer}>
+        <Text style={styles.welcomeText}>Welcome to MatchUp</Text>
+        <Text style={styles.description}>
+          The easiest way to find and schedule local football matches.
+        </Text>
       </View>
     </View>
   );
 }
 
-// External Stylesheet
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "white",
-    paddingHorizontal: 20,
-    paddingTop: 50, // Moves everything down
+    backgroundColor: "#424242",
+    paddingHorizontal: 0,
+    paddingTop: 60,
   },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 40, // Moves title and sign-in down
-    padding: 20
+    marginBottom: 20,
+    paddingHorizontal: 20,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 1,
+      height: 5,
+    },
+    shadowOpacity: 0.23,
   },
   title: {
-    fontSize: 20,
+    fontSize: 30,
+    color: "white",
     fontWeight: "bold",
   },
-  loginContainer: {
+  titleUp: {
+    color: "#4CAF50",
+  },
+  loginButton: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 5, // Adds spacing between text and icon
+    backgroundColor: "#5A5A5A",
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderRadius: 8,
   },
   loginText: {
-    fontSize: 16,
-    color: "black",
+    fontSize: 15,
+    color: "white",
+    marginRight: 5,
   },
-  navLinks: {
-    flex: 1,
-    justifyContent: "center",
+  imageContainer: {
+    position: "relative",
+    width: "100%",
+    height: 400,
+  },
+  image: {
+    width: "100%",
+    height: "100%",
+  },
+  gradient: {
+    position: "absolute",
+    width: "100%",
+    height: "100%",
+    bottom: 0,
+  },
+  textContainer: {
     alignItems: "center",
+    marginTop: 20,
   },
-  linkText: {
-    fontSize: 18,
-    color: "blue",
-    marginVertical: 10,
+  welcomeText: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "white",
+    marginBottom: 10,
+  },
+  description: {
+    fontSize: 16,
+    color: "#DDDDDD",
+    textAlign: "center",
+    paddingHorizontal: 20,
   },
 });
-

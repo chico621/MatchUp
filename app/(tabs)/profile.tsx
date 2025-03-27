@@ -81,7 +81,7 @@ const Profile = () => {
 
     if (!user) {
         return (
-            <SafeAreaView style={styles.centeredContainer}>
+            <SafeAreaView style={styles.container}>
                 <Text style={styles.noUserText}>Please login to view your profile</Text>
                 <Link style={styles.noUserText} href="/signin">Sign In Here</Link>
             </SafeAreaView>
@@ -89,7 +89,7 @@ const Profile = () => {
     }
 
     return (
-        <SafeAreaView style={styles.centeredContainer}>
+        <SafeAreaView style={styles.container}>
             <Text style={styles.profileTitle}>Profile</Text>
 
             <View style={styles.userDetailsContainer}>
@@ -114,7 +114,7 @@ const Profile = () => {
                 </View>
             </View>
 
-            <TouchableOpacity onPress={handleLogout} className="bg-white shadow-md shadow-zinc-300 rounded-full w-full py-4 mt-5">
+            <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
                 <Text className="text-center" style={styles.logoutButtonText}>Logout</Text>
             </TouchableOpacity>
         </SafeAreaView>
@@ -122,11 +122,11 @@ const Profile = () => {
 };
 
 const styles = StyleSheet.create({
-    centeredContainer: {
+    container: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: 'white',
+        backgroundColor: '#424242',
         padding: 20,
     },
     noUserText: {
@@ -137,7 +137,7 @@ const styles = StyleSheet.create({
     profileTitle: {
         fontSize: 26,
         fontWeight: 'bold',
-        color: '#333',
+        color: 'white',
         marginBottom: 20,
     },
     userDetailsContainer: {
@@ -145,7 +145,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     userDetailCard: {
-        backgroundColor: '#f9f9f9',
+        backgroundColor: '#585858',
         padding: 20,
         borderRadius: 10,
         width: '100%',
@@ -158,15 +158,17 @@ const styles = StyleSheet.create({
     },
     userDetailText: {
         fontSize: 18,
-        color: '#555',
+        color: '#fff',
         marginBottom: 10,
     },
     logoutButton: {
-        backgroundColor: '#F44336',
+        backgroundColor: '#C24C43',
         paddingHorizontal: 24,
         paddingVertical: 12,
+        width: '100%',
+        marginTop: 20,
         borderRadius: 50,
-        shadowColor: '#000',
+        shadowColor: 'black',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.25,
         shadowRadius: 3.5,
@@ -176,7 +178,7 @@ const styles = StyleSheet.create({
         fontSize: 18,
         fontWeight: '600',
     }, addButton: {
-        backgroundColor: 'white',
+        backgroundColor: '#7f7f7f',
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.25,

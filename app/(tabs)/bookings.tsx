@@ -3,6 +3,7 @@ import { View, Text, ScrollView, SafeAreaView, StyleSheet, TouchableOpacity, Ale
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { useRouter } from 'expo-router';
+import { useFocusEffect } from '@react-navigation/native'; // Import useFocusEffect
 
 const Bookings = () => {
     const [matches, setMatches] = useState<any[]>([]); // Store matches
@@ -50,7 +51,7 @@ const Bookings = () => {
             .then(response => {
                 if (response.status === 204) {
                     Alert.alert('Match deleted successfully!');
-                    fetchMatches(); // Refresh the list after deletion
+                    fetchMatches(); // Refresh the list after deleting match
                 }
             })
             .catch(error => {
@@ -60,9 +61,16 @@ const Bookings = () => {
     };
 
     useEffect(() => {
-        fetchMatches(); // Fetch matches
-        fetchUserInfo(); // Fetch user info (admin status)
+        fetchMatches(); // Fetch matches on initial load
+        fetchUserInfo(); // Fetch user info (for retrieving admin status)
     }, []);
+
+    // Re-fetch matches when the screen is focused using useFocusEffect
+    useFocusEffect(
+        React.useCallback(() => {
+            fetchMatches(); // Refresh matches when the screen is focused, this allows me to update the list after adding a new match
+        }, [])
+    );
 
     return (
         <SafeAreaView style={styles.container}>
@@ -83,11 +91,11 @@ const Bookings = () => {
                                 <Text>{`Time: ${match.match_time}`}</Text>
                                 <Text>{`Location: ${match.location}`}</Text>
 
-                                {/* Only show Delete button if user is admin */}
+                                {/* Only show Delete button if the current user is admin */}
                                 {isAdmin && (
                                     <TouchableOpacity
                                         style={styles.button}
-                                        onPress={() => deleteMatch(match._id)}>
+                                        onPress={() => deleteMatch(match._id)} >
                                         <Text style={styles.ButtonText}>Delete</Text>
                                     </TouchableOpacity>
                                 )}
@@ -103,51 +111,64 @@ const Bookings = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: 'white',
+        backgroundColor: '#424242',
     },
     buttonContainer: {
-        padding: 10,
+        padding: 15,
     },
     scrollContainer: {
         paddingBottom: 20,
+        paddingHorizontal: 10,
     },
     header: {
-        paddingLeft: 10,
-        fontSize: 20,
+        fontSize: 24,
         fontWeight: 'bold',
+        color: '#fff',
+        marginBottom: 20,
+        marginLeft: 10,
     },
     matchCard: {
-        backgroundColor: '#fff',
+        backgroundColor: '#585858',
         padding: 20,
-        margin: 10,
-        borderRadius: 8,
+        marginBottom: 15,
+        borderRadius: 12,
         elevation: 5,
         shadowOpacity: 0.2,
         shadowRadius: 4,
         shadowOffset: { width: 0, height: 2 },
         shadowColor: '#000',
+        borderWidth: 1,
+        borderColor: '#444',
+    },
+    matchInfoText: {
+        color: '#fff',
+        fontSize: 16,
+        marginBottom: 8,
     },
     addButton: {
-        backgroundColor: 'white',
+        backgroundColor: '#007bff',
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.25,
         shadowRadius: 3.5,
         elevation: 5,
         borderRadius: 50,
-        paddingVertical: 12,
+        paddingVertical: 14,
+        marginBottom: 20,
     },
     ButtonText: {
         textAlign: 'center',
         fontSize: 16,
         fontWeight: 'bold',
+        color: '#fff',
     },
     button: {
         backgroundColor: '#ff4d4d',
-        paddingVertical: 10,
-        paddingHorizontal: 20,
+        paddingVertical: 12,
+        paddingHorizontal: 25,
         borderRadius: 8,
-        marginTop: 10,
+        marginTop: 15,
+        alignSelf: 'flex-start',
     },
 });
 

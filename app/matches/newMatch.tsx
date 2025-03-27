@@ -1,26 +1,49 @@
 import { View, Text, ScrollView, SafeAreaView, StyleSheet, TouchableOpacity, TextInput } from 'react-native';
 import { backButton } from "../apiFunctions";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import React from 'react';
 
 const NewMatch = () => {
-    // State to hold user input
+    // State to hold user input and team1_id
     const [date, setDate] = useState('');
     const [time, setTime] = useState('');
     const [location, setLocation] = useState('');
+    const [team1Id, setTeam1Id] = useState('');
 
+    // Fetch user info (including team1_id) when the component mounts
+    useEffect(() => {
+        const fetchUserInfo = async () => {
+            try {
+                const userData = await AsyncStorage.getItem('user');
+                if (userData) {
+                    const parsedUser = JSON.parse(userData);
+                    setTeam1Id(parsedUser.team_id); // Assuming team1_id is stored in user info
+                }
+            } catch (error) {
+                console.error('Error fetching user info:', error);
+            }
+        };
+
+        fetchUserInfo();
+    }, []);
+
+    // Function to submit the match
     const submitMatch = () => {
         if (!date || !time || !location) {
             alert('Please fill in all fields!');
             return;
         }
 
+        // Prepare form data, including team1_id
         const formData = new URLSearchParams();
         formData.append('date', date);
         formData.append('time', time);
         formData.append('location', location);
+        formData.append('team1_id', team1Id);
 
+        // Make the POST request to create the match
         axios.post('http://192.168.0.160:5000/api/v1.0/matches', formData, {
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
@@ -33,6 +56,10 @@ const NewMatch = () => {
                     setTime('');
                     setLocation('');
                 }
+            })
+            .catch(error => {
+                console.error('Error submitting match:', error);
+                alert('Failed to add match.');
             });
     };
 
@@ -56,7 +83,7 @@ const NewMatch = () => {
                     />
                 </View>
 
-                {/* Time  */}
+                {/* Time */}
                 <View style={styles.inputContainer}>
                     <Text style={styles.label}>Time:</Text>
                     <TextInput

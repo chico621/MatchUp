@@ -1,6 +1,6 @@
-import { View, Text } from 'react-native'
-import React from 'react'
-import { Tabs } from 'expo-router'
+import React from 'react';
+import { Tabs } from 'expo-router';
+import { Ionicons, MaterialIcons, FontAwesome5 } from '@expo/vector-icons';
 
 const TabsLayout = () => {
     return (
@@ -8,12 +8,14 @@ const TabsLayout = () => {
             screenOptions={{
                 tabBarShowLabel: true,
                 tabBarStyle: {
-                    backgroundColor: 'coral',
+                    backgroundColor: 'white',
                     position: 'absolute',
                     borderTopColor: 'black',
                     borderTopWidth: 1,
                     minHeight: 70,
-                }
+                },
+                tabBarActiveTintColor: '#424242',
+                tabBarInactiveTintColor: '#black',
             }}
         >
             <Tabs.Screen
@@ -21,11 +23,9 @@ const TabsLayout = () => {
                 options={{
                     title: 'Home',
                     headerShown: false,
-                    tabBarIcon: () => (
-                        <View>
-                            <Text>Home</Text>
-                        </View>
-                    )
+                    tabBarIcon: ({ color, size }) => (
+                        <Ionicons name="home" size={20} color={color} />
+                    ),
                 }}
             />
             <Tabs.Screen
@@ -33,39 +33,33 @@ const TabsLayout = () => {
                 options={{
                     title: 'Matches',
                     headerShown: false,
-                    tabBarIcon: () => (
-                        <View>
-                            <Text>Matches</Text>
-                        </View>
-                    )
+                    tabBarIcon: ({ color, size }) => (
+                        <MaterialIcons name="sports-soccer" size={20} color={color} />
+                    ),
                 }}
             />
             <Tabs.Screen
                 name="messages"
                 options={{
-                    title: 'messages',
+                    title: 'Messages',
                     headerShown: false,
-                    tabBarIcon: () => (
-                        <View>
-                            <Text>Messages</Text>
-                        </View>
-                    )
+                    tabBarIcon: ({ color, size }) => (
+                        <Ionicons name="chatbubble-ellipses" size={20} color={color} />
+                    ),
                 }}
             />
             <Tabs.Screen
                 name="profile"
                 options={{
-                    title: 'profile',
+                    title: 'Profile',
                     headerShown: false,
-                    tabBarIcon: () => (
-                        <View>
-                            <Text>Profile</Text>
-                        </View>
-                    )
+                    tabBarIcon: ({ color, size }) => (
+                        <FontAwesome5 name="user" size={20} color={color} />
+                    ),
                 }}
             />
         </Tabs>
-    )
-}
+    );
+};
 
-export default TabsLayout
+export default TabsLayout;
