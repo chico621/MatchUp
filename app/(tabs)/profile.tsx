@@ -10,16 +10,22 @@ import { useIsFocused } from '@react-navigation/native';
 const Profile = () => {
     const [user, setUser] = useState<any>(null);
     const [userID, setUserID] = useState<string | null>(null);
+    const [teamName, setTeamName] = useState<string | null>(null);
+    const [isManager, setIsManager] = useState<boolean>(false);
     const router = useRouter();
     const isFocused = useIsFocused();
 
-    // Fetch user data when screen is focused
     useEffect(() => {
         const fetchUserData = async () => {
             try {
                 const userData = await AsyncStorage.getItem('user');
                 if (userData) {
-                    setUser(JSON.parse(userData));
+                    const parsedUser = JSON.parse(userData);
+                    setUser(parsedUser);
+
+                    if (parsedUser.team_id) {
+                        fetchTeamData(parsedUser.team_id);
+                    }
                 }
             } catch (error) {
                 console.log('Error fetching user data:', error);
@@ -34,11 +40,25 @@ const Profile = () => {
             }
         };
 
+        const fetchTeamData = async (teamID: string) => {
+            try {
+                const response = await axios.get(`http://192.168.0.160:5000/api/v1.0/teams/${teamID}`);
+                if (response.data) {
+                    setTeamName(response.data.team_name);
+                    // Check if the user is the manager
+                    const isUserManager = response.data.manager_id === userID;
+                    setIsManager(isUserManager);
+                }
+            } catch (error) {
+                console.log('Error fetching team data:', error);
+                setTeamName(null);
+            }
+        };
+
         if (isFocused) {
             fetchUserData();
             fetchUserID();
         }
-
     }, [isFocused]);
 
     const addTeam = () => {
@@ -58,13 +78,13 @@ const Profile = () => {
                 });
 
                 if (response.status === 200) {
-                    // Clear AsyncStorage on successful logout
                     await AsyncStorage.removeItem('authToken');
                     await AsyncStorage.removeItem('user');
                     await AsyncStorage.removeItem('userID');
 
                     setUser(null);
                     setUserID(null);
+                    setTeamName(null);
 
                     Alert.alert('Logged out successfully!', 'You have been logged out.', [
                         { text: 'OK', onPress: () => router.push('/signin') },
@@ -104,12 +124,20 @@ const Profile = () => {
 
             <View style={styles.userDetailsContainer}>
                 <View style={styles.userDetailCard}>
-                    <Text style={styles.userDetailText}>Current Team: {user.team_id}</Text>
+                    <Text style={styles.userDetailText}>
+                        Current Team: {teamName ? teamName : "Not in a team"}
+                    </Text>
+                    {isManager ? (
+                        <TouchableOpacity style={styles.addButton} onPress={() => router.push("../teams/manageTeam")}>
+                            <Text style={styles.ButtonText}>Manage Team</Text>
+                        </TouchableOpacity>
+                    ) : (
+                        <TouchableOpacity style={styles.addButton} onPress={JoinTeam}>
+                            <Text style={styles.ButtonText}>Join a team</Text>
+                        </TouchableOpacity>
+                    )}
                     <TouchableOpacity style={styles.addButton} onPress={addTeam}>
                         <Text style={styles.ButtonText}>Create new team</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.addButton} onPress={JoinTeam}>
-                        <Text style={styles.ButtonText}>Join a team</Text>
                     </TouchableOpacity>
                 </View>
             </View>
@@ -177,7 +205,8 @@ const styles = StyleSheet.create({
         color: 'Black',
         fontSize: 18,
         fontWeight: '600',
-    }, addButton: {
+    },
+    addButton: {
         backgroundColor: '#7f7f7f',
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },

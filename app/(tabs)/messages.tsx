@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, ActivityIndicator, StyleSheet, ScrollView
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { useRouter } from 'expo-router';
+import { useIsFocused } from '@react-navigation/native';
 
 const Messages = () => {
     const [userID, setUserID] = useState<string | null>(null);
@@ -10,6 +11,7 @@ const Messages = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const router = useRouter();
+    const isFocused = useIsFocused();  // Hook to check if the screen is focused
 
     // Fetch userID from AsyncStorage
     useEffect(() => {
@@ -32,7 +34,7 @@ const Messages = () => {
         fetchUserID();
     }, []);
 
-    // Fetch conversations by using the userID of the logged-in user
+    // Fetch conversations when the userID is set or the screen is focused
     useEffect(() => {
         const fetchConversations = async () => {
             if (userID) {
@@ -51,15 +53,22 @@ const Messages = () => {
                 } finally {
                     setLoading(false);
                 }
-            } else {
-                setLoading(false);
             }
         };
 
-        if (userID) {
+        if (userID || isFocused) {
             fetchConversations();
+        } else {
+            setLoading(false); // Stop loading if userID is not found
         }
-    }, [userID]);
+    }, [userID, isFocused]);  // Refresh when the screen is focused or userID is set
+
+    // Function to update the list of conversations after a conversation is deleted
+    const updateConversations = (conversationId: string) => {
+        setConversations((prevConversations) =>
+            prevConversations.filter((conversation) => conversation.conversation_id !== conversationId)
+        );
+    };
 
     const fetchConversation = (conversationId: string) => {
         if (conversationId) {
@@ -70,19 +79,32 @@ const Messages = () => {
     };
 
     if (loading) {
-        return <ActivityIndicator size="large" color="#0000ff" />;
+        return (
+            <View style={styles.centered}>
+                <ActivityIndicator size="large" color="#0000ff" />
+                <Text style={styles.loadingText}>Loading...</Text>
+            </View>
+        );
     }
 
     if (error) {
-        return <Text>{error}</Text>;
+        return (
+            <View style={styles.centered}>
+                <Text style={styles.errorText}>{error}</Text>
+                <TouchableOpacity onPress={() => setLoading(true)} style={styles.retryButton}>
+                    <Text style={styles.retryButtonText}>Retry</Text>
+                </TouchableOpacity>
+            </View>
+        );
     }
 
     return (
         <View style={styles.container}>
             <Text style={styles.header}>Your Conversations</Text>
-            <TouchableOpacity style={styles.addButton}>
+            <TouchableOpacity style={styles.addButton} onPress={() => router.push('../conversations/newConversation')}>
                 <Text>+</Text>
             </TouchableOpacity>
+
             {conversations.length > 0 ? (
                 <ScrollView>
                     {conversations.map((item) => {
@@ -94,10 +116,10 @@ const Messages = () => {
                             <TouchableOpacity key={item.conversation_id} onPress={() => fetchConversation(item.conversation_id)}>
                                 <View style={styles.conversationItem}>
                                     <Text style={styles.conversationTitle}>
-                                        {participants.join(', ')}
+                                        {item.conversation_name}
                                     </Text>
                                     <Text style={styles.conversationDate}>
-                                        Last updated: {item.last_updated_at}
+                                        {item.last_updated_at}
                                     </Text>
                                     <Text style={styles.messagePreview}>
                                         {item.messages.length > 0
@@ -120,6 +142,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#424242',
+        padding: 10,
     },
     header: {
         marginTop: 50,
@@ -146,7 +169,7 @@ const styles = StyleSheet.create({
     },
     conversationDate: {
         fontSize: 14,
-        color: '#560',
+        color: 'grey',
     },
     messagePreview: {
         fontSize: 16,
@@ -167,6 +190,34 @@ const styles = StyleSheet.create({
         top: 10,
         right: 10,
         marginTop: 50,
+    },
+    retryButton: {
+        backgroundColor: '#C24C43',
+        paddingHorizontal: 24,
+        paddingVertical: 12,
+        borderRadius: 50,
+        marginTop: 20,
+    },
+    retryButtonText: {
+        color: '#fff',
+        fontSize: 16,
+        fontWeight: 'bold',
+    },
+    loadingText: {
+        marginTop: 20,
+        color: '#fff',
+        fontSize: 18,
+    },
+    errorText: {
+        color: 'red',
+        fontSize: 18,
+        textAlign: 'center',
+    },
+    centered: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#424242',
     },
 });
 

@@ -3,14 +3,14 @@ import { View, Text, ScrollView, SafeAreaView, StyleSheet, TouchableOpacity, Ale
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { useRouter } from 'expo-router';
-import { useFocusEffect } from '@react-navigation/native'; // Import useFocusEffect
+import { useFocusEffect } from '@react-navigation/native';
+import { AntDesign, MaterialIcons } from '@expo/vector-icons';
 
 const Bookings = () => {
-    const [matches, setMatches] = useState<any[]>([]); // Store matches
-    const [isAdmin, setIsAdmin] = useState<boolean>(false); // Admin status
+    const [matches, setMatches] = useState<any[]>([]);
+    const [isAdmin, setIsAdmin] = useState<boolean>(false);
     const router = useRouter();
 
-    // Fetch matches
     const fetchMatches = () => {
         axios.get('http://192.168.0.160:5000/api/v1.0/matches')
             .then(response => {
@@ -21,88 +21,84 @@ const Bookings = () => {
             });
     };
 
-    // Fetch user info (including admin status)
     const fetchUserInfo = async () => {
         try {
             const userInfo = await AsyncStorage.getItem('user');
             if (userInfo) {
                 const parsedUser = JSON.parse(userInfo);
-                setIsAdmin(parsedUser.admin); // Assuming the 'admin' field is stored as a boolean
+                setIsAdmin(parsedUser.admin);
             }
         } catch (error) {
             console.error('Error fetching user info:', error);
         }
     };
 
-    // Fetch the selected match
     const fetchMatch = (matchId: string) => {
-        axios.get(`http://192.168.0.160:5000/api/v1.0/matches/${matchId}`)
-            .then(response => {
-                router.push(`../matches/${matchId}`);
-            })
-            .catch(error => {
-                console.error('Error fetching match:', error);
-            });
+        router.push(`../matches/${matchId}`);
     };
 
-    // Function to delete a match
     const deleteMatch = (matchId: string) => {
-        axios.delete(`http://192.168.0.160:5000/api/v1.0/matches/${matchId}`)
-            .then(response => {
-                if (response.status === 204) {
-                    Alert.alert('Match deleted successfully!');
-                    fetchMatches(); // Refresh the list after deleting match
+        Alert.alert(
+            "Confirm Delete",
+            "Are you sure you want to delete this match?",
+            [
+                { text: "Cancel", style: "cancel" },
+                {
+                    text: "Delete", onPress: () => {
+                        axios.delete(`http://192.168.0.160:5000/api/v1.0/matches/${matchId}`)
+                            .then(response => {
+                                if (response.status === 204) {
+                                    Alert.alert('Match deleted successfully!');
+                                    fetchMatches();
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error deleting match:', error);
+                                Alert.alert('Failed to delete match.');
+                            });
+                    }, style: "destructive"
                 }
-            })
-            .catch(error => {
-                console.error('Error deleting match:', error);
-                Alert.alert('Failed to delete match.');
-            });
+            ]
+        );
     };
 
     useEffect(() => {
-        fetchMatches(); // Fetch matches on initial load
-        fetchUserInfo(); // Fetch user info (for retrieving admin status)
+        fetchMatches();
+        fetchUserInfo();
     }, []);
 
-    // Re-fetch matches when the screen is focused using useFocusEffect
     useFocusEffect(
         React.useCallback(() => {
-            fetchMatches(); // Refresh matches when the screen is focused, this allows me to update the list after adding a new match
+            fetchMatches();
         }, [])
     );
 
     return (
         <SafeAreaView style={styles.container}>
             <ScrollView contentContainerStyle={styles.scrollContainer}>
-                <View>
-                    <View style={styles.buttonContainer}>
-                        <TouchableOpacity style={styles.addButton} onPress={() => router.push("../matches/newMatch")}>
-                            <Text style={styles.ButtonText}>Add Match</Text>
-                        </TouchableOpacity>
-                    </View>
-
-                    <Text style={styles.header}>Matches:</Text>
-                    {matches.map((match: any) => (
-                        <TouchableOpacity key={match._id} onPress={() => fetchMatch(match._id)}>
-                            <View style={styles.matchCard}>
-                                <Text>{`Team ${match.team1_id} v Team ${match.team2_id}`}</Text>
-                                <Text>{`Date: ${match.match_date}`}</Text>
-                                <Text>{`Time: ${match.match_time}`}</Text>
-                                <Text>{`Location: ${match.location}`}</Text>
-
-                                {/* Only show Delete button if the current user is admin */}
-                                {isAdmin && (
-                                    <TouchableOpacity
-                                        style={styles.button}
-                                        onPress={() => deleteMatch(match._id)} >
-                                        <Text style={styles.ButtonText}>Delete</Text>
-                                    </TouchableOpacity>
-                                )}
-                            </View>
-                        </TouchableOpacity>
-                    ))}
+                <View style={styles.buttonContainer}>
+                    <TouchableOpacity style={styles.addButton} onPress={() => router.push("../matches/newMatch")}>
+                        <AntDesign name="pluscircleo" size={20} color="#fff" style={styles.icon} />
+                        <Text style={styles.ButtonText}>Add Match</Text>
+                    </TouchableOpacity>
                 </View>
+
+                <Text style={styles.header}>Upcoming Matches</Text>
+                {matches.map((match: any) => (
+                    <TouchableOpacity key={match._id} onPress={() => fetchMatch(match._id)}>
+                        <View style={styles.matchCard}>
+                            <Text style={styles.matchTitle}>{match.team1_name} {match.team2_name ? `vs ${match.team2_name}` : "(Looking for opponent)"}</Text>
+                            <Text style={styles.matchInfo}>{`📅 ${match.match_date}  |  ⏰ ${match.match_time}`}</Text>
+                            <Text style={styles.matchInfo}>{`📍 ${match.location}`}</Text>
+                            {isAdmin && (
+                                <TouchableOpacity style={styles.deleteButton} onPress={() => deleteMatch(match._id)}>
+                                    <MaterialIcons name="delete" size={18} color="#fff" />
+                                    <Text style={styles.deleteText}>Delete</Text>
+                                </TouchableOpacity>
+                            )}
+                        </View>
+                    </TouchableOpacity>
+                ))}
             </ScrollView>
         </SafeAreaView>
     );
@@ -113,62 +109,79 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#424242',
     },
-    buttonContainer: {
-        padding: 15,
-    },
     scrollContainer: {
         paddingBottom: 20,
         paddingHorizontal: 10,
+    },
+    buttonContainer: {
+        alignItems: 'center',
+        marginVertical: 15,
+    },
+    addButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#007bff',
+        paddingVertical: 12,
+        paddingHorizontal: 20,
+        borderRadius: 25,
+        shadowColor: '#000',
+        shadowOpacity: 0.3,
+        shadowRadius: 4,
+        shadowOffset: { width: 0, height: 2 },
+        elevation: 5,
+    },
+    icon: {
+        marginRight: 8,
+    },
+    ButtonText: {
+        color: '#fff',
+        fontSize: 16,
+        fontWeight: 'bold',
     },
     header: {
         fontSize: 24,
         fontWeight: 'bold',
         color: '#fff',
-        marginBottom: 20,
-        marginLeft: 10,
+        textAlign: 'center',
+        marginBottom: 15,
     },
     matchCard: {
         backgroundColor: '#585858',
         padding: 20,
         marginBottom: 15,
         borderRadius: 12,
-        elevation: 5,
-        shadowOpacity: 0.2,
-        shadowRadius: 4,
-        shadowOffset: { width: 0, height: 2 },
-        shadowColor: '#000',
+        shadowOpacity: 0.3,
+        shadowRadius: 5,
+        shadowOffset: { width: 0, height: 3 },
         borderWidth: 1,
-        borderColor: '#444',
+        borderColor: '#3a3a3c',
     },
-    matchInfoText: {
-        color: '#fff',
-        fontSize: 16,
-        marginBottom: 8,
-    },
-    addButton: {
-        backgroundColor: '#007bff',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.25,
-        shadowRadius: 3.5,
-        elevation: 5,
-        borderRadius: 50,
-        paddingVertical: 14,
-        marginBottom: 20,
-    },
-    ButtonText: {
-        textAlign: 'center',
-        fontSize: 16,
+    matchTitle: {
+        fontSize: 18,
         fontWeight: 'bold',
         color: '#fff',
+        marginBottom: 6,
     },
-    button: {
-        backgroundColor: '#ff4d4d',
-        paddingVertical: 12,
-        paddingHorizontal: 25,
+    matchInfo: {
+        color: '#bbb',
+        fontSize: 14,
+        marginBottom: 4,
+    },
+    deleteButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#ff3b30',
+        paddingVertical: 8,
+        paddingHorizontal: 15,
         borderRadius: 8,
-        marginTop: 15,
+        marginTop: 12,
         alignSelf: 'flex-start',
+    },
+    deleteText: {
+        color: '#fff',
+        fontSize: 14,
+        fontWeight: 'bold',
+        marginLeft: 5,
     },
 });
 

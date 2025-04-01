@@ -34,12 +34,38 @@ export default function Index() {
         />
       </View>
 
-      {/* Main Body Containing Text */}
+      {/* Main Body */}
       <View style={styles.textContainer}>
         <Text style={styles.welcomeText}>Welcome to MatchUp</Text>
         <Text style={styles.description}>
           The easiest way to find and schedule local football matches.
         </Text>
+
+        {/* Key Features */}
+        <View style={styles.featuresContainer}>
+          <View style={styles.featureItem}>
+            <Ionicons name="calendar-outline" size={24} color="#4CAF50" />
+            <Text style={styles.featureText}>Easy Match Scheduling</Text>
+          </View>
+
+          <View style={styles.featureItem}>
+            <Ionicons name="chatbubbles-outline" size={24} color="#4CAF50" />
+            <Text style={styles.featureText}>Direct Team Communication</Text>
+          </View>
+
+          <View style={styles.featureItem}>
+            <Ionicons name="people-outline" size={24} color="#4CAF50" />
+            <Text style={styles.featureText}>Find Local Teams Instantly</Text>
+          </View>
+        </View>
+
+        {/* Call-to-Action (CTA) */}
+        <Link href="/signup" asChild>
+          <TouchableOpacity style={styles.ctaButton}>
+            <Text style={styles.ctaText}>Get Started</Text>
+            <Ionicons name="arrow-forward-circle-outline" size={24} color="white" />
+          </TouchableOpacity>
+        </Link>
       </View>
     </View>
   );
@@ -59,10 +85,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     paddingHorizontal: 20,
     shadowColor: "#000",
-    shadowOffset: {
-      width: 1,
-      height: 5,
-    },
+    shadowOffset: { width: 1, height: 5 },
     shadowOpacity: 0.23,
   },
   title: {
@@ -104,6 +127,7 @@ const styles = StyleSheet.create({
   textContainer: {
     alignItems: "center",
     marginTop: 20,
+    paddingHorizontal: 20,
   },
   welcomeText: {
     fontSize: 24,
@@ -115,6 +139,34 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#DDDDDD",
     textAlign: "center",
+  },
+  featuresContainer: {
+    marginTop: 20,
+    width: "100%",
+  },
+  featureItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 10,
+  },
+  featureText: {
+    fontSize: 16,
+    color: "white",
+    marginLeft: 10,
+  },
+  ctaButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#4CAF50",
+    paddingVertical: 12,
     paddingHorizontal: 20,
+    borderRadius: 8,
+    marginTop: 20,
+  },
+  ctaText: {
+    fontSize: 16,
+    color: "white",
+    fontWeight: "bold",
+    marginRight: 10,
   },
 });

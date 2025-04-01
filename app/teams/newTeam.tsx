@@ -70,7 +70,7 @@ const NewTeam = () => {
                 <TouchableOpacity style={styles.backButton} onPress={backButton}>
                     <Text>{'<'}</Text>
                 </TouchableOpacity>
-                <Text style={styles.titleHeader}>Create a New Team</Text>
+                <Text style={styles.title}>Create a New Team</Text>
 
                 {/* Team Name */}
                 <View style={styles.inputContainer}>
@@ -97,6 +97,7 @@ const NewTeam = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        backgroundColor: '#585858',
     },
     addButton: {
         backgroundColor: 'white',
@@ -130,9 +131,10 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
-    titleHeader: {
+    title: {
         fontSize: 20,
         textAlign: 'center',
+        color: 'white',
     },
     inputContainer: {
         marginBottom: 20,
@@ -141,6 +143,7 @@ const styles = StyleSheet.create({
     label: {
         fontSize: 16,
         marginBottom: 5,
+        color: 'white',
     },
     input: {
         borderWidth: 1,

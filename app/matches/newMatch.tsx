@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, SafeAreaView, StyleSheet, TouchableOpacity, TextInput } from 'react-native';
+import { View, Text, ScrollView, SafeAreaView, StyleSheet, TouchableOpacity, TextInput, Alert } from 'react-native';
 import { backButton } from "../apiFunctions";
 import { useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -6,20 +6,20 @@ import axios from 'axios';
 import React from 'react';
 
 const NewMatch = () => {
-    // State to hold user input and team1_id
+    // State to hold user input
     const [date, setDate] = useState('');
     const [time, setTime] = useState('');
     const [location, setLocation] = useState('');
     const [team1Id, setTeam1Id] = useState('');
 
-    // Fetch user info (including team1_id) when the component mounts
+    // Fetch user info when the component mounts
     useEffect(() => {
         const fetchUserInfo = async () => {
             try {
                 const userData = await AsyncStorage.getItem('user');
                 if (userData) {
                     const parsedUser = JSON.parse(userData);
-                    setTeam1Id(parsedUser.team_id); // Assuming team1_id is stored in user info
+                    setTeam1Id(parsedUser.team_id);
                 }
             } catch (error) {
                 console.error('Error fetching user info:', error);
@@ -29,10 +29,32 @@ const NewMatch = () => {
         fetchUserInfo();
     }, []);
 
+    // Function to validate date format (DD/MM/YYYY)
+    const isValidDate = (date: string) => {
+        const regex = /^(\d{2})\/(\d{2})\/(\d{4})$/;
+        return regex.test(date);
+    };
+
+    // Function to validate time format (HH:MM)
+    const isValidTime = (time: string) => {
+        const regex = /^([01]?[0-9]|2[0-3]):([0-5][0-9])$/;
+        return regex.test(time);
+    };
+
     // Function to submit the match
     const submitMatch = () => {
         if (!date || !time || !location) {
-            alert('Please fill in all fields!');
+            alert('Please fill in all fields!'); // Validate that all fields are filled
+            return;
+        }
+
+        if (!isValidDate(date)) {
+            alert('Please enter a valid date in the format DD/MM/YYYY.'); // Validate that valid date format is inputted
+            return;
+        }
+
+        if (!isValidTime(time)) {
+            alert('Please enter a valid time in the format HH:MM.'); // Validate that valid time format is inputted
             return;
         }
 
@@ -69,7 +91,7 @@ const NewMatch = () => {
                 <TouchableOpacity style={styles.backButton} onPress={backButton}>
                     <Text>{'<'}</Text>
                 </TouchableOpacity>
-                <Text style={styles.titleHeader}>Create a new Match</Text>
+                <Text style={styles.title}>Create a new Match</Text>
 
                 {/* Date */}
                 <View style={styles.inputContainer}>
@@ -120,6 +142,7 @@ const NewMatch = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        backgroundColor: '#585858',
     },
     addButton: {
         backgroundColor: 'white',
@@ -153,9 +176,10 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
-    titleHeader: {
+    title: {
         fontSize: 20,
         textAlign: 'center',
+        color: 'white',
     },
     inputContainer: {
         marginBottom: 20,
@@ -164,6 +188,7 @@ const styles = StyleSheet.create({
     label: {
         fontSize: 16,
         marginBottom: 5,
+        color: 'white',
     },
     input: {
         borderWidth: 1,

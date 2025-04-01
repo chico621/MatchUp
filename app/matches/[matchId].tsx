@@ -4,12 +4,13 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { backButton, deleteMatch } from "../apiFunctions";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { AntDesign, MaterialIcons } from '@expo/vector-icons';
 
 const MatchDetails = () => {
     const { matchId } = useLocalSearchParams(); // Extract matchId from URL params
     const [match, setMatch] = useState<any | null>(null);
     const [user, setUser] = useState<any>(null);
-    const [userID, setUserID] = useState<string | null>(null);
+    const [isAdmin, setIsAdmin] = useState<boolean>(false);
     const [loading, setLoading] = useState(true);
 
     const GOOGLE_MAPS_API_KEY = "AIzaSyAJlWtIahYjVCF3ti2cKfpYsPRRprMMmsY";
@@ -25,6 +26,8 @@ const MatchDetails = () => {
                 const userData = await AsyncStorage.getItem('user');
                 if (userData) {
                     setUser(JSON.parse(userData));
+                    const parsedUser = JSON.parse(userData);
+                    setIsAdmin(parsedUser.admin);
                 }
             } catch (error) {
                 console.log('Error fetching user data:', error);
@@ -57,14 +60,15 @@ const MatchDetails = () => {
     if (loading) {
         return (
             <View style={styles.loader}>
-                <ActivityIndicator size="large" color="#0000ff" />
+                <ActivityIndicator size="large" color="#007bff" />
+                <Text style={styles.loaderText}>Loading match details...</Text>
             </View>
         );
     }
 
     if (!match) {
         return (
-            <View>
+            <View style={styles.errorContainer}>
                 <Text style={styles.errorText}>Error: Match not found or invalid matchId.</Text>
             </View>
         );
@@ -100,36 +104,39 @@ const MatchDetails = () => {
         }
     };
 
-
     return (
         <View style={styles.matchCard}>
             <TouchableOpacity style={styles.backButton} onPress={backButton}>
                 <Text>{'<'}</Text>
             </TouchableOpacity>
-            <Text style={styles.title}>{`Team ${match.team1_id} vs Team ${match.team2_id}`}</Text>
-            <Text>{`Date: ${match.match_date}`}</Text>
-            <Text>{`Time: ${match.match_time}`}</Text>
-            <Text>{`Location: ${match.location}`}</Text>
+            <Text style={styles.title}>
+                {match.team2_name ? `${match.team1_name} v ${match.team2_name}` : match.team1_name}
+            </Text>
+            <View style={styles.detailsCard}>
+                <Text style={styles.details}>{`📅 ${match.match_date}`}</Text>
+                <Text style={styles.details}>{`⏰ ${match.match_time}`}</Text>
+                <Text style={styles.details}>{`📍 ${match.location}`}</Text>
+            </View>
 
             {/* Google Maps API */}
             <Image
                 source={{ uri: staticMapUrl }}
-                style={{ width: '100%', height: 200, marginVertical: 10 }}
+                style={styles.mapImage}
             />
 
-            <TouchableOpacity
-                style={styles.joinButton}
-                onPress={joinMatch}
-            >
-                <Text style={styles.ButtonText}>Join</Text>
-            </TouchableOpacity>
+            {/* Action Buttons */}
+            <View style={styles.buttonsContainer}>
+                <TouchableOpacity style={styles.joinButton} onPress={joinMatch}>
+                    <Text style={styles.ButtonText}>Join Match</Text>
+                </TouchableOpacity>
 
-            <TouchableOpacity
-                style={styles.deleteButton}
-                onPress={() => deleteMatch(match._id)}
-            >
-                <Text style={styles.ButtonText}>Delete</Text>
-            </TouchableOpacity>
+                {isAdmin && (
+                    <TouchableOpacity style={styles.deleteButton} onPress={() => deleteMatch(match._id)}>
+                        <MaterialIcons name="delete" size={18} color="#fff" />
+                        <Text style={styles.ButtonText}>Delete Match</Text>
+                    </TouchableOpacity>
+                )}
+            </View>
         </View>
     );
 };
@@ -141,11 +148,31 @@ const styles = StyleSheet.create({
         fontWeight: "bold",
         marginBottom: 10,
         textAlign: "center",
+        color: 'white',
+        backgroundColor: '#585858',
+        borderRadius: 15,
+        padding: 5,
     },
     loader: {
         flex: 1,
         justifyContent: "center",
-        alignItems: "center"
+        alignItems: "center",
+        backgroundColor: '#ecf0f1',
+    },
+    detailsCard: {
+        backgroundColor: '#585858',
+        borderRadius: 15,
+        padding: 5,
+    },
+    loaderText: {
+        marginTop: 10,
+        fontSize: 18,
+        color: '#007bff',
+    },
+    errorContainer: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
     },
     errorText: {
         textAlign: "center",
@@ -155,8 +182,14 @@ const styles = StyleSheet.create({
     },
     matchCard: {
         flex: 1,
-        backgroundColor: '#fff',
+        backgroundColor: '#424242',
         padding: 15,
+        borderRadius: 12,
+        elevation: 5,
+        shadowColor: "#000",
+        shadowOpacity: 0.1,
+        shadowRadius: 6,
+        shadowOffset: { width: 0, height: 2 },
     },
     backButton: {
         marginTop: 40,
@@ -171,34 +204,51 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
-    joinButton: {
-        backgroundColor: 'white',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.25,
-        shadowRadius: 3.5,
-        elevation: 5,
-        borderRadius: 50,
-        paddingVertical: 12,
+    details: {
+        fontSize: 16,
+        color: 'white',
+        marginBottom: 5,
+        padding: 5,
+    },
+    mapImage: {
+        width: '100%',
+        height: 200,
+        marginVertical: 10,
+        borderRadius: 10,
+    },
+    buttonsContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-evenly',
         marginTop: 20,
     },
-    deleteButton: {
-        backgroundColor: 'white',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.25,
-        shadowRadius: 3.5,
-        elevation: 5,
+    joinButton: {
+        backgroundColor: '#4CAF50',
         borderRadius: 50,
         paddingVertical: 12,
-        marginTop: 10,
+        paddingHorizontal: 30,
+        shadowOpacity: 0.3,
+        shadowRadius: 5,
+        shadowOffset: { width: 0, height: 2 },
+        marginHorizontal: 5,
+    },
+    deleteButton: {
+        alignItems: 'center',
+        flexDirection: 'row',
+        backgroundColor: '#ff3b30',
+        borderRadius: 50,
+        paddingVertical: 12,
+        paddingHorizontal: 30,
+        shadowOpacity: 0.3,
+        shadowRadius: 5,
+        shadowOffset: { width: 0, height: 2 },
+        marginHorizontal: 5,
     },
     ButtonText: {
         textAlign: 'center',
         fontSize: 16,
         fontWeight: 'bold',
+        color: '#fff',
     },
 });
 
-export default
-    MatchDetails;
+export default MatchDetails;

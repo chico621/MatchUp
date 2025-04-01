@@ -1,6 +1,6 @@
 import React from 'react';
 import { Tabs } from 'expo-router';
-import { Ionicons, MaterialIcons, FontAwesome5 } from '@expo/vector-icons';
+import { Ionicons, MaterialCommunityIcons, FontAwesome5 } from '@expo/vector-icons';
 
 const TabsLayout = () => {
     return (
@@ -11,11 +11,11 @@ const TabsLayout = () => {
                     backgroundColor: 'white',
                     position: 'absolute',
                     borderTopColor: 'black',
-                    borderTopWidth: 1,
+                    borderTopWidth: 0,
                     minHeight: 70,
                 },
-                tabBarActiveTintColor: '#424242',
-                tabBarInactiveTintColor: '#black',
+                tabBarActiveTintColor: 'black',
+                tabBarInactiveTintColor: 'grey',
             }}
         >
             <Tabs.Screen
@@ -34,7 +34,7 @@ const TabsLayout = () => {
                     title: 'Matches',
                     headerShown: false,
                     tabBarIcon: ({ color, size }) => (
-                        <MaterialIcons name="sports-soccer" size={20} color={color} />
+                        <MaterialCommunityIcons name="soccer-field" size={20} color={color} />
                     ),
                 }}
             />
@@ -54,7 +54,7 @@ const TabsLayout = () => {
                     title: 'Profile',
                     headerShown: false,
                     tabBarIcon: ({ color, size }) => (
-                        <FontAwesome5 name="user" size={20} color={color} />
+                        <FontAwesome5 name="users" size={20} color={color} />
                     ),
                 }}
             />

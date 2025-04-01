@@ -19,7 +19,7 @@ const JoinATeam = () => {
                 }
             });
             setTeams(response.data);
-            setFilteredTeams(response.data);  // Initially, display all teams
+            setFilteredTeams(response.data);  // Initially, display all teams that user can joij
         } catch (error) {
             console.error('Error fetching teams:', error);
         }
@@ -48,25 +48,34 @@ const JoinATeam = () => {
     };
 
     // Handle joining a team
-    const joinTeam = async (teamId: string) => {
+    const joinTeam = async (teamId: string, userId: string) => {
         try {
-            const response = await axios.post(
+            const response = await axios.put(
                 `http://192.168.0.160:5000/api/v1.0/teams/${teamId}/join`,
-                {},
+                { user_id: userId },  // Send the user_id in the request body
                 {
                     headers: {
                         'Authorization': `Bearer ${authToken}`,
+                        'Content-Type': 'application/json',
                     }
                 }
             );
+
             if (response.status === 200) {
                 alert('Successfully joined the team!');
+            } else {
+                alert('Failed to join the team. Please try again later.');
             }
         } catch (error) {
-            console.error('Error joining team:', error);
             alert('Failed to join the team.');
         }
     };
+
+    const fetchUserId = async () => {
+        const userId = await AsyncStorage.getItem('userID'); // Fetch User ID from AsyncStorage
+        return userId;
+    };
+
 
     return (
         <SafeAreaView style={styles.container}>
@@ -76,11 +85,10 @@ const JoinATeam = () => {
             <Text style={styles.header}>Join a Team</Text>
 
             {/* Search Bar */}
-            <TextInput
+            <TextInput style={styles.searchInput}
                 placeholder="Search for a team"
                 value={searchQuery}
                 onChangeText={handleSearch}
-                className="border-b-2 border-black my-4 p-2 margin: 20"
             />
 
             {/* List of teams */}
@@ -90,7 +98,17 @@ const JoinATeam = () => {
                 renderItem={({ item }) => (
                     <View style={styles.teamItem}>
                         <Text style={styles.teamName}>{item.team_name}</Text>
-                        <TouchableOpacity style={styles.joinButton} onPress={() => joinTeam(item._id)}>
+                        <TouchableOpacity
+                            style={styles.joinButton}
+                            onPress={async () => {
+                                const userId = await fetchUserId(); // Fetch the userId before joining
+                                if (userId) {
+                                    joinTeam(item._id, userId); // Sends team_id userId to the joinTeam function
+                                } else {
+                                    alert('User not logged in.');
+                                }
+                            }}
+                        >
                             <Text style={styles.joinButtonText}>Join</Text>
                         </TouchableOpacity>
                     </View>
@@ -106,16 +124,19 @@ const styles = StyleSheet.create({
         flex: 1,
         paddingTop: 20,
         paddingHorizontal: 16,
+        backgroundColor: '#424242',
     },
     header: {
         fontSize: 24,
         fontWeight: 'bold',
         textAlign: 'center',
+        color: 'white',
         marginBottom: 20,
     },
     searchInput: {
-        borderWidth: 1,
+        backgroundColor: '#fff',
         borderColor: '#ccc',
+        borderWidth: 1,
         borderRadius: 10,
         paddingHorizontal: 10,
         paddingVertical: 8,
@@ -124,18 +145,21 @@ const styles = StyleSheet.create({
     },
     listContainer: {
         paddingBottom: 20,
+        padding: 15,
     },
     teamItem: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        backgroundColor: '#f9f9f9',
+        backgroundColor: '#585858',
         borderRadius: 10,
         margin: 5,
         padding: 15,
     },
     teamName: {
         fontSize: 18,
+        color: '#fff',
+        fontWeight: 'bold',
     },
     joinButton: {
         backgroundColor: '#007BFF',
