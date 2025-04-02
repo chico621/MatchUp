@@ -8,18 +8,20 @@ import { AntDesign, MaterialIcons } from '@expo/vector-icons';
 
 const MatchDetails = () => {
     const { matchId } = useLocalSearchParams(); // Extract matchId from URL params
-    const [match, setMatch] = useState<any | null>(null);
-    const [user, setUser] = useState<any>(null);
-    const [isAdmin, setIsAdmin] = useState<boolean>(false);
-    const [loading, setLoading] = useState(true);
+    const [match, setMatch] = useState<any | null>(null); // To store match data
+    const [user, setUser] = useState<any>(null); // To store user data
+    const [isAdmin, setIsAdmin] = useState<boolean>(false); // To check if user is admin
+    const [loading, setLoading] = useState(true); // Loading state
 
-    const GOOGLE_MAPS_API_KEY = "AIzaSyAJlWtIahYjVCF3ti2cKfpYsPRRprMMmsY";
+    const GOOGLE_MAPS_API_KEY = "AIzaSyAJlWtIahYjVCF3ti2cKfpYsPRRprMMmsY"; // API Key
 
     useEffect(() => {
-        if (!matchId || typeof matchId !== 'string') {
+        if (!matchId || typeof matchId !== 'string') { // Check if matchId is valid
             setLoading(false);
             return;
         }
+
+        // Fetch user data from AsyncStorage
 
         const fetchUserData = async () => {
             try {
@@ -57,7 +59,7 @@ const MatchDetails = () => {
             });
     }, [matchId]);
 
-    if (loading) {
+    if (loading) { // Show loading indicator
         return (
             <View style={styles.loader}>
                 <ActivityIndicator size="large" color="#007bff" />
@@ -66,7 +68,7 @@ const MatchDetails = () => {
         );
     }
 
-    if (!match) {
+    if (!match) { // Show error message if match not found
         return (
             <View style={styles.errorContainer}>
                 <Text style={styles.errorText}>Error: Match not found or invalid matchId.</Text>
@@ -74,13 +76,13 @@ const MatchDetails = () => {
         );
     }
 
-    const staticMapUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${encodeURIComponent(
+    const staticMapUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${encodeURIComponent( // Generate static map URL
         match.location
     )}&zoom=15&size=600x300&maptype=roadmap&markers=color:red%7Clabel:S%7C${encodeURIComponent(
         match.location
     )}&key=${GOOGLE_MAPS_API_KEY}`;
 
-    const joinMatch = async () => {
+    const joinMatch = async () => { // Function to join match
         if (!user || !user.team_id) {
             alert("Team ID not found!");
             return;

@@ -11,10 +11,10 @@ const Bookings = () => {
     const [isAdmin, setIsAdmin] = useState<boolean>(false);
     const router = useRouter();
 
-    const fetchMatches = () => {
+    const fetchMatches = () => { // Fetch matches from the API
         axios.get('http://192.168.0.160:5000/api/v1.0/matches')
             .then(response => {
-                setMatches(response.data);
+                setMatches(response.data); // Set response data to matches state
             })
             .catch(error => {
                 console.error('Error fetching matches:', error);
@@ -23,10 +23,10 @@ const Bookings = () => {
 
     const fetchUserInfo = async () => {
         try {
-            const userInfo = await AsyncStorage.getItem('user');
+            const userInfo = await AsyncStorage.getItem('user'); // Fetch user info from AsyncStorage
             if (userInfo) {
                 const parsedUser = JSON.parse(userInfo);
-                setIsAdmin(parsedUser.admin);
+                setIsAdmin(parsedUser.admin); // Set isAdmin state based on user info
             }
         } catch (error) {
             console.error('Error fetching user info:', error);
@@ -34,10 +34,10 @@ const Bookings = () => {
     };
 
     const fetchMatch = (matchId: string) => {
-        router.push(`../matches/${matchId}`);
+        router.push(`../matches/${matchId}`); // Navigate to match details
     };
 
-    const deleteMatch = (matchId: string) => {
+    const deleteMatch = (matchId: string) => { // Function to delete a match
         Alert.alert(
             "Confirm Delete",
             "Are you sure you want to delete this match?",
@@ -45,14 +45,14 @@ const Bookings = () => {
                 { text: "Cancel", style: "cancel" },
                 {
                     text: "Delete", onPress: () => {
-                        axios.delete(`http://192.168.0.160:5000/api/v1.0/matches/${matchId}`)
+                        axios.delete(`http://192.168.0.160:5000/api/v1.0/matches/${matchId}`) // Delete match from API
                             .then(response => {
-                                if (response.status === 204) {
+                                if (response.status === 204) { // Match deleted successfully
                                     Alert.alert('Match deleted successfully!');
                                     fetchMatches();
                                 }
                             })
-                            .catch(error => {
+                            .catch(error => { // Handle error
                                 console.error('Error deleting match:', error);
                                 Alert.alert('Failed to delete match.');
                             });
@@ -63,13 +63,13 @@ const Bookings = () => {
     };
 
     useEffect(() => {
-        fetchMatches();
+        fetchMatches(); // Fetch matches and userinfo when the component mounts
         fetchUserInfo();
     }, []);
 
     useFocusEffect(
         React.useCallback(() => {
-            fetchMatches();
+            fetchMatches(); // Fetch matches when the screen is focused, This ensures that the matches list is updated when the user navigates back to this screen
         }, [])
     );
 
@@ -83,6 +83,8 @@ const Bookings = () => {
                     </TouchableOpacity>
                 </View>
 
+                {/* Display all current Matches */}
+
                 <Text style={styles.header}>Upcoming Matches</Text>
                 {matches.map((match: any) => (
                     <TouchableOpacity key={match._id} onPress={() => fetchMatch(match._id)}>
@@ -90,7 +92,7 @@ const Bookings = () => {
                             <Text style={styles.matchTitle}>{match.team1_name} {match.team2_name ? `vs ${match.team2_name}` : "(Looking for opponent)"}</Text>
                             <Text style={styles.matchInfo}>{`📅 ${match.match_date}  |  ⏰ ${match.match_time}`}</Text>
                             <Text style={styles.matchInfo}>{`📍 ${match.location}`}</Text>
-                            {isAdmin && (
+                            {isAdmin && ( // Show delete button only if the user is an admin
                                 <TouchableOpacity style={styles.deleteButton} onPress={() => deleteMatch(match._id)}>
                                     <MaterialIcons name="delete" size={18} color="#fff" />
                                     <Text style={styles.deleteText}>Delete</Text>
@@ -104,7 +106,7 @@ const Bookings = () => {
     );
 };
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create({ // Styles for the component
     container: {
         flex: 1,
         backgroundColor: '#424242',

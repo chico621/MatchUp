@@ -8,23 +8,22 @@ import { useRouter } from 'expo-router';
 import { useIsFocused } from '@react-navigation/native';
 
 const Profile = () => {
-    const [user, setUser] = useState<any>(null);
-    const [userID, setUserID] = useState<string | null>(null);
-    const [teamName, setTeamName] = useState<string | null>(null);
-    const [isManager, setIsManager] = useState<boolean>(false);
-    const router = useRouter();
-    const isFocused = useIsFocused();
+    const [user, setUser] = useState<any>(null); // This will hold the user data
+    const [userID, setUserID] = useState<string | null>(null); // This will hold the user ID
+    const [teamName, setTeamName] = useState<string | null>(null); // This will hold the team name
+    const router = useRouter(); // This will be used to navigate to other screens
+    const isFocused = useIsFocused(); // This will be used to check if the screen is focused
 
     useEffect(() => {
         const fetchUserData = async () => {
             try {
-                const userData = await AsyncStorage.getItem('user');
+                const userData = await AsyncStorage.getItem('user'); // This will get the user data from AsyncStorage
                 if (userData) {
                     const parsedUser = JSON.parse(userData);
-                    setUser(parsedUser);
+                    setUser(parsedUser); // Set the user data to state
 
                     if (parsedUser.team_id) {
-                        fetchTeamData(parsedUser.team_id);
+                        fetchTeamData(parsedUser.team_id); // This will fetch the team data using the team ID
                     }
                 }
             } catch (error) {
@@ -33,7 +32,7 @@ const Profile = () => {
             }
         };
 
-        const fetchUserID = async () => {
+        const fetchUserID = async () => { // This will get the user ID from AsyncStorage
             const storedUserID = await AsyncStorage.getItem('userID');
             if (storedUserID) {
                 setUserID(storedUserID);
@@ -42,12 +41,10 @@ const Profile = () => {
 
         const fetchTeamData = async (teamID: string) => {
             try {
-                const response = await axios.get(`http://192.168.0.160:5000/api/v1.0/teams/${teamID}`);
+                const response = await axios.get(`http://192.168.0.160:5000/api/v1.0/teams/${teamID}`); // Fetch team data using the team ID
                 if (response.data) {
                     setTeamName(response.data.team_name);
-                    // Check if the user is the manager
-                    const isUserManager = response.data.manager_id === userID;
-                    setIsManager(isUserManager);
+
                 }
             } catch (error) {
                 console.log('Error fetching team data:', error);
@@ -62,25 +59,25 @@ const Profile = () => {
     }, [isFocused]);
 
     const addTeam = () => {
-        router.push("../teams/newTeam");
+        router.push("../teams/newTeam"); // This will navigate to the new team screen
     };
 
     const JoinTeam = () => {
-        router.push("../teams/JoinTeam");
+        router.push("../teams/JoinTeam"); // This will navigate to the join team screen
     };
 
     const handleLogout = async () => {
         try {
             const token = await AsyncStorage.getItem('authToken');
             if (token) {
-                const response = await axios.get('http://192.168.0.160:5000/api/v1.0/logout', {
+                const response = await axios.get('http://192.168.0.160:5000/api/v1.0/logout', { // Logout endpoint
                     headers: { 'x-access-token': token },
                 });
 
                 if (response.status === 200) {
-                    await AsyncStorage.removeItem('authToken');
-                    await AsyncStorage.removeItem('user');
-                    await AsyncStorage.removeItem('userID');
+                    await AsyncStorage.removeItem('authToken'); // Remove the auth token
+                    await AsyncStorage.removeItem('user'); // Remove the user data
+                    await AsyncStorage.removeItem('userID'); // Remove the user ID
 
                     setUser(null);
                     setUserID(null);
@@ -102,7 +99,7 @@ const Profile = () => {
     if (!user) {
         return (
             <SafeAreaView style={styles.container}>
-                <Text style={styles.noUserText}>Please login to view your profile</Text>
+                <Text style={styles.noUserText}>Please login to view your profile</Text> {/* This is the text that will be displayed when the user is not logged in */}
                 <Link style={styles.noUserText} href="/signin">Sign In Here</Link>
             </SafeAreaView>
         );
@@ -111,6 +108,8 @@ const Profile = () => {
     return (
         <SafeAreaView style={styles.container}>
             <Text style={styles.profileTitle}>Profile</Text>
+
+            {/* Display user details */}
 
             <View style={styles.userDetailsContainer}>
                 <View style={styles.userDetailCard}>
@@ -122,26 +121,24 @@ const Profile = () => {
 
             <Text style={styles.profileTitle}>Teams</Text>
 
+            {/* Display users team details */}
+
             <View style={styles.userDetailsContainer}>
                 <View style={styles.userDetailCard}>
                     <Text style={styles.userDetailText}>
                         Current Team: {teamName ? teamName : "Not in a team"}
                     </Text>
-                    {isManager ? (
-                        <TouchableOpacity style={styles.addButton} onPress={() => router.push("../teams/manageTeam")}>
-                            <Text style={styles.ButtonText}>Manage Team</Text>
-                        </TouchableOpacity>
-                    ) : (
-                        <TouchableOpacity style={styles.addButton} onPress={JoinTeam}>
-                            <Text style={styles.ButtonText}>Join a team</Text>
-                        </TouchableOpacity>
-                    )}
+
+                    <TouchableOpacity style={styles.addButton} onPress={JoinTeam}>
+                        <Text style={styles.ButtonText}>Join a team</Text>
+                    </TouchableOpacity>
+
                     <TouchableOpacity style={styles.addButton} onPress={addTeam}>
                         <Text style={styles.ButtonText}>Create new team</Text>
                     </TouchableOpacity>
                 </View>
             </View>
-
+            {/* Logout button */}
             <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
                 <Text className="text-center" style={styles.logoutButtonText}>Logout</Text>
             </TouchableOpacity>

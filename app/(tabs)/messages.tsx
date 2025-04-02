@@ -17,15 +17,15 @@ const Messages = () => {
     useEffect(() => {
         const fetchUserID = async () => {
             try {
-                const storedUserID = await AsyncStorage.getItem('userID');
+                const storedUserID = await AsyncStorage.getItem('userID'); // Get userID from AsyncStorage
                 if (storedUserID) {
-                    setUserID(storedUserID);
+                    setUserID(storedUserID); // Set userID state
                 } else {
-                    setError('User ID not found in storage');
+                    setError('User ID not found in storage'); // Handle case where userID is not found
                     setLoading(false);
                 }
             } catch (error) {
-                console.error('Error fetching userID from AsyncStorage:', error);
+                console.error('Error fetching userID from AsyncStorage:', error); // Handle error
                 setError('Error fetching user ID');
                 setLoading(false);
             }
@@ -40,12 +40,12 @@ const Messages = () => {
             if (userID) {
                 try {
                     const response = await axios.get(
-                        `http://192.168.0.160:5000/api/v1.0/conversations/${userID}`
+                        `http://192.168.0.160:5000/api/v1.0/conversations/${userID}` // Fetch conversations for the user
                     );
-                    if (response.status === 200) {
+                    if (response.status === 200) { // Check if the response is successful
                         setConversations(response.data);
                     } else {
-                        setError('Failed to fetch conversations');
+                        setError('Failed to fetch conversations'); // Handle non-200 responses
                     }
                 } catch (error) {
                     console.error('Error fetching conversations:', error);
@@ -64,30 +64,30 @@ const Messages = () => {
     }, [userID, isFocused]);  // Refresh when the screen is focused or userID is set
 
     // Function to update the list of conversations after a conversation is deleted
-    const updateConversations = (conversationId: string) => {
-        setConversations((prevConversations) =>
+    /* const updateConversations = (conversationId: string) => {
+     setConversations((prevConversations) =>
             prevConversations.filter((conversation) => conversation.conversation_id !== conversationId)
         );
-    };
+    }; */
 
     const fetchConversation = (conversationId: string) => {
         if (conversationId) {
-            router.push(`../conversations/${conversationId}`);
+            router.push(`../conversations/${conversationId}`); // Navigate to the conversation details
         } else {
             console.error('Conversation ID is undefined');
         }
     };
 
-    if (loading) {
+    if (loading) { // Loading state
         return (
             <View style={styles.centered}>
-                <ActivityIndicator size="large" color="#0000ff" />
+                <ActivityIndicator size="large" color="black" />
                 <Text style={styles.loadingText}>Loading...</Text>
             </View>
         );
     }
 
-    if (error) {
+    if (error) { // Error state, will alow the user to retry fetching
         return (
             <View style={styles.centered}>
                 <Text style={styles.errorText}>{error}</Text>
@@ -104,6 +104,8 @@ const Messages = () => {
             <TouchableOpacity style={styles.addButton} onPress={() => router.push('../conversations/newConversation')}>
                 <Text>+</Text>
             </TouchableOpacity>
+
+            {/* Display conversations */}
 
             {conversations.length > 0 ? (
                 <ScrollView>
@@ -138,7 +140,7 @@ const Messages = () => {
     );
 };
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create({ // Styles for the component
     container: {
         flex: 1,
         backgroundColor: '#424242',

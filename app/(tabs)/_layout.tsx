@@ -19,42 +19,42 @@ const TabsLayout = () => {
             }}
         >
             <Tabs.Screen
-                name="index"
+                name="index" // Home screen
                 options={{
                     title: 'Home',
                     headerShown: false,
                     tabBarIcon: ({ color, size }) => (
-                        <Ionicons name="home" size={20} color={color} />
+                        <Ionicons name="home" size={20} color={color} /> // Home icon
                     ),
                 }}
             />
             <Tabs.Screen
-                name="bookings"
+                name="bookings" // Bookings screen
                 options={{
                     title: 'Matches',
                     headerShown: false,
                     tabBarIcon: ({ color, size }) => (
-                        <MaterialCommunityIcons name="soccer-field" size={20} color={color} />
+                        <MaterialCommunityIcons name="soccer-field" size={20} color={color} /> // Matches icon
                     ),
                 }}
             />
             <Tabs.Screen
-                name="messages"
+                name="messages" // Messages screen
                 options={{
                     title: 'Messages',
                     headerShown: false,
                     tabBarIcon: ({ color, size }) => (
-                        <Ionicons name="chatbubble-ellipses" size={20} color={color} />
+                        <Ionicons name="chatbubble-ellipses" size={20} color={color} /> // Messages icon
                     ),
                 }}
             />
             <Tabs.Screen
-                name="profile"
+                name="profile" // Profile screen
                 options={{
                     title: 'Profile',
                     headerShown: false,
                     tabBarIcon: ({ color, size }) => (
-                        <FontAwesome5 name="users" size={20} color={color} />
+                        <FontAwesome5 name="users" size={20} color={color} /> // Profile icon
                     ),
                 }}
             />

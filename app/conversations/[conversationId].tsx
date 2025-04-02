@@ -7,9 +7,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { backButton } from '../apiFunctions';
 
 const ConversationDetails = () => {
-    const { conversationId } = useLocalSearchParams();
-    const [conversation, setConversation] = useState<any>(null);
-    const [newMessage, setNewMessage] = useState<string>('');
+    const { conversationId } = useLocalSearchParams(); // Get conversationId from URL params
+    const [conversation, setConversation] = useState<any>(null); // To store conversation data
+    const [newMessage, setNewMessage] = useState<string>(''); // To store new message text
     const [usernames, setUsernames] = useState<Record<string, string>>({}); // To store mapping of userID to username
 
     // Fetch conversation and user names
@@ -41,6 +41,8 @@ const ConversationDetails = () => {
         setUsernames(newUsernames);
     };
 
+    // Function to send a new message
+
     const sendMessage = async () => {
         if (!newMessage.trim()) return;
 
@@ -58,7 +60,7 @@ const ConversationDetails = () => {
                 sent_at: new Date().toISOString(),
             };
 
-            await axios.post(`http://192.168.0.160:5000/api/v1.0/sendmessage/${conversationId}`, messageData);
+            await axios.post(`http://192.168.0.160:5000/api/v1.0/sendmessage/${conversationId}`, messageData); // Send message endpoint
             setConversation((prev: any) => ({
                 ...prev,
                 messages: [...prev.messages, messageData],
@@ -68,6 +70,8 @@ const ConversationDetails = () => {
             console.error('Error sending message:', error);
         }
     };
+
+    // Function to handle conversation deletion
 
     const handleDeleteConversation = () => {
         Alert.alert(
@@ -82,7 +86,7 @@ const ConversationDetails = () => {
                     text: 'Delete',
                     onPress: async () => {
                         try {
-                            const response = await axios.delete(`http://192.168.0.160:5000/api/v1.0/conversations/${conversationId}`);
+                            const response = await axios.delete(`http://192.168.0.160:5000/api/v1.0/conversations/${conversationId}`); // Delete conversation endpoint
                             if (response.status === 204) {
                                 Alert.alert('Success', 'Conversation deleted');
                                 backButton(); // Navigate back after delete

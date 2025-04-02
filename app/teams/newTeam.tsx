@@ -6,12 +6,11 @@ import axios from 'axios';
 import React from 'react';
 
 const NewTeam = () => {
-    // State to hold user input
-    const [teamName, setTeamName] = useState('');
-    const [userID, setUserID] = useState<string | null>(null);
+    const [teamName, setTeamName] = useState(''); // To store team name input
+    const [userID, setUserID] = useState<string | null>(null); // To store user ID
 
     useEffect(() => {
-        const fetchUserID = async () => {
+        const fetchUserID = async () => { // Fetch userID from AsyncStorage
             try {
                 const storedUserID = await AsyncStorage.getItem('userID');
                 if (storedUserID) {
@@ -25,7 +24,7 @@ const NewTeam = () => {
         fetchUserID();
     }, []);
 
-    const submitTeam = async () => {
+    const submitTeam = async () => { // Validate team name and user ID
         if (!teamName) {
             alert('Please fill in the team name!');
             return;
@@ -37,7 +36,7 @@ const NewTeam = () => {
         }
 
         try {
-            const token = await AsyncStorage.getItem('authToken');
+            const token = await AsyncStorage.getItem('authToken'); // Checks if user is logged in
             if (!token) {
                 alert("You're not logged in!");
                 return;
@@ -48,7 +47,7 @@ const NewTeam = () => {
             formData.append('user_id', userID); // Using stored userID
             formData.append('players', JSON.stringify([]));
 
-            const response = await axios.post('http://192.168.0.160:5000/api/v1.0/teams', formData, {
+            const response = await axios.post('http://192.168.0.160:5000/api/v1.0/teams', formData, { // API call to create a new team, appends formData
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                     'x-access-token': `${token}`

@@ -7,10 +7,10 @@ import React from 'react';
 
 const NewMatch = () => {
     // State to hold user input
-    const [date, setDate] = useState('');
-    const [time, setTime] = useState('');
-    const [location, setLocation] = useState('');
-    const [team1Id, setTeam1Id] = useState('');
+    const [date, setDate] = useState(''); // To store date input
+    const [time, setTime] = useState(''); // To store time input
+    const [location, setLocation] = useState(''); // To store location input
+    const [team1Id, setTeam1Id] = useState(''); // To store team1_id
 
     // Fetch user info when the component mounts
     useEffect(() => {
@@ -58,7 +58,7 @@ const NewMatch = () => {
             return;
         }
 
-        // Prepare form data, including team1_id
+        // Prepare the data to be sent in the POST request
         const formData = new URLSearchParams();
         formData.append('date', date);
         formData.append('time', time);

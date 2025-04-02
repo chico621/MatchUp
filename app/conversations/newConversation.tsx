@@ -6,13 +6,13 @@ import { useRouter } from 'expo-router';
 import { backButton } from '../apiFunctions';
 
 const NewConversation = () => {
-    const [participants, setParticipants] = useState<string[]>([]);
-    const [users, setUsers] = useState<any[]>([]);
-    const [filteredUsers, setFilteredUsers] = useState<any[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [searchQuery, setSearchQuery] = useState('');
+    const [participants, setParticipants] = useState<string[]>([]); // To store selected participants
+    const [users, setUsers] = useState<any[]>([]); // To store all users
+    const [filteredUsers, setFilteredUsers] = useState<any[]>([]); // To store filtered users
+    const [loading, setLoading] = useState(true); // Loading state
+    const [searchQuery, setSearchQuery] = useState(''); // State for search query
     const [conversationName, setConversationName] = useState('');  // State for conversation name
-    const router = useRouter();
+    const router = useRouter(); // Router for navigation
 
     // Fetch all users
     useEffect(() => {
@@ -56,22 +56,22 @@ const NewConversation = () => {
     const createConversation = async () => {
         const userID = await AsyncStorage.getItem('userID');
         if (!userID) {
-            Alert.alert('Error', 'User ID not found.');
+            Alert.alert('Error', 'User ID not found.'); // Checks if userID is retrieved
             return;
         }
 
         if (participants.length === 0) {
-            Alert.alert('Error', 'Please select at least one participant.');
+            Alert.alert('Error', 'Please select at least one participant.'); // Check if participants are selected
             return;
         }
 
         if (conversationName.trim() === '') {
-            Alert.alert('Error', 'Please provide a conversation name.');
+            Alert.alert('Error', 'Please provide a conversation name.'); // Check if conversation name is empty
             return;
         }
 
         try {
-            const response = await axios.post('http://192.168.0.160:5000/api/v1.0/conversations', {
+            const response = await axios.post('http://192.168.0.160:5000/api/v1.0/conversations', { // Create conversation endpoint
                 conversation_name: conversationName,  // Send conversation name
                 participants: [userID, ...participants],
             });

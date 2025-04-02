@@ -8,7 +8,7 @@ const JoinATeam = () => {
     const [teams, setTeams] = useState<any[]>([]);  // Array of teams
     const [searchQuery, setSearchQuery] = useState('');  // Search query input
     const [filteredTeams, setFilteredTeams] = useState<any[]>([]);  // Filtered teams based on search query
-    const [authToken, setAuthToken] = useState<string | null>(null);
+    const [authToken, setAuthToken] = useState<string | null>(null); // Auth token for API requests
 
     // Fetch teams from API
     const fetchTeams = async () => {

@@ -1,7 +1,7 @@
 import { Text, View, TouchableOpacity, StyleSheet, Image } from "react-native";
 import { Link } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { LinearGradient } from "expo-linear-gradient"; // Import gradient
+import { LinearGradient } from "expo-linear-gradient";
 
 export default function Index() {
   return (
@@ -59,7 +59,7 @@ export default function Index() {
           </View>
         </View>
 
-        {/* Call-to-Action (CTA) */}
+        {/* Call-to-Action */}
         <Link href="/signup" asChild>
           <TouchableOpacity style={styles.ctaButton}>
             <Text style={styles.ctaText}>Get Started</Text>
@@ -71,7 +71,7 @@ export default function Index() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create({ // Styles for the component
   container: {
     flex: 1,
     backgroundColor: "#424242",
