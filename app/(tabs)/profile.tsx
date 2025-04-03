@@ -99,7 +99,7 @@ const Profile = () => {
     if (!user) {
         return (
             <SafeAreaView style={styles.container}>
-                <Text style={styles.noUserText}>Please login to view your profile</Text> {/* This is the text that will be displayed when the user is not logged in */}
+                <Text style={styles.noUserText}>Please login to view your profile</Text>
                 <Link style={styles.noUserText} href="/signin">Sign In Here</Link>
             </SafeAreaView>
         );

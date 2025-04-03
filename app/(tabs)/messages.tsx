@@ -21,11 +21,10 @@ const Messages = () => {
                 if (storedUserID) {
                     setUserID(storedUserID); // Set userID state
                 } else {
-                    setError('User ID not found in storage'); // Handle case where userID is not found
+                    setError('Please Login'); // Handle case where userID is not found
                     setLoading(false);
                 }
             } catch (error) {
-                console.error('Error fetching userID from AsyncStorage:', error); // Handle error
                 setError('Error fetching user ID');
                 setLoading(false);
             }
@@ -43,7 +42,11 @@ const Messages = () => {
                         `http://192.168.0.160:5000/api/v1.0/conversations/${userID}` // Fetch conversations for the user
                     );
                     if (response.status === 200) { // Check if the response is successful
-                        setConversations(response.data);
+                        if (response.data && Array.isArray(response.data)) {
+                            setConversations(response.data); // Set conversations if available
+                        } else {
+                            setConversations([]); // Ensure conversations is an empty array if no data
+                        }
                     } else {
                         setError('Failed to fetch conversations'); // Handle non-200 responses
                     }
@@ -63,13 +66,6 @@ const Messages = () => {
         }
     }, [userID, isFocused]);  // Refresh when the screen is focused or userID is set
 
-    // Function to update the list of conversations after a conversation is deleted
-    /* const updateConversations = (conversationId: string) => {
-     setConversations((prevConversations) =>
-            prevConversations.filter((conversation) => conversation.conversation_id !== conversationId)
-        );
-    }; */
-
     const fetchConversation = (conversationId: string) => {
         if (conversationId) {
             router.push(`../conversations/${conversationId}`); // Navigate to the conversation details
@@ -87,13 +83,10 @@ const Messages = () => {
         );
     }
 
-    if (error) { // Error state, will alow the user to retry fetching
+    if (error) { // Error state, will allow the user to retry fetching
         return (
             <View style={styles.centered}>
                 <Text style={styles.errorText}>{error}</Text>
-                <TouchableOpacity onPress={() => setLoading(true)} style={styles.retryButton}>
-                    <Text style={styles.retryButtonText}>Retry</Text>
-                </TouchableOpacity>
             </View>
         );
     }
@@ -106,7 +99,6 @@ const Messages = () => {
             </TouchableOpacity>
 
             {/* Display conversations */}
-
             {conversations.length > 0 ? (
                 <ScrollView>
                     {conversations.map((item) => {
@@ -134,7 +126,7 @@ const Messages = () => {
                     })}
                 </ScrollView>
             ) : (
-                <Text>No conversations found.</Text>
+                <Text style={styles.noConversations}>No conversations found.</Text>
             )}
         </View>
     );
@@ -172,6 +164,12 @@ const styles = StyleSheet.create({ // Styles for the component
     conversationDate: {
         fontSize: 14,
         color: 'grey',
+    },
+    noConversations: {
+        color: 'grey',
+        fontSize: 18,
+        textAlign: 'center',
+        marginTop: 20,
     },
     messagePreview: {
         fontSize: 16,
@@ -211,7 +209,7 @@ const styles = StyleSheet.create({ // Styles for the component
         fontSize: 18,
     },
     errorText: {
-        color: 'red',
+        color: 'gray',
         fontSize: 18,
         textAlign: 'center',
     },

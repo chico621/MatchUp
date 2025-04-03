@@ -84,7 +84,7 @@ const MatchDetails = () => {
 
     const joinMatch = async () => { // Function to join match
         if (!user || !user.team_id) {
-            alert("Team ID not found!");
+            alert("Please Log in to join a match.");
             return;
         }
 

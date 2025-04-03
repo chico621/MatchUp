@@ -9,9 +9,10 @@ import { AntDesign, MaterialIcons } from '@expo/vector-icons';
 const Bookings = () => {
     const [matches, setMatches] = useState<any[]>([]);
     const [isAdmin, setIsAdmin] = useState<boolean>(false);
+    const [userLoggedIn, setUserLoggedIn] = useState<boolean>(false); // New state to track login status
     const router = useRouter();
 
-    const fetchMatches = () => { // Fetch matches from the API
+    const fetchMatches = () => {
         axios.get('http://192.168.0.160:5000/api/v1.0/matches')
             .then(response => {
                 setMatches(response.data); // Set response data to matches state
@@ -27,9 +28,11 @@ const Bookings = () => {
             if (userInfo) {
                 const parsedUser = JSON.parse(userInfo);
                 setIsAdmin(parsedUser.admin); // Set isAdmin state based on user info
+                setUserLoggedIn(true); // Set userLoggedIn to true if user info is found
             }
         } catch (error) {
             console.error('Error fetching user info:', error);
+            setUserLoggedIn(false); // Set userLoggedIn to false in case of error
         }
     };
 
@@ -76,15 +79,16 @@ const Bookings = () => {
     return (
         <SafeAreaView style={styles.container}>
             <ScrollView contentContainerStyle={styles.scrollContainer}>
-                <View style={styles.buttonContainer}>
-                    <TouchableOpacity style={styles.addButton} onPress={() => router.push("../matches/newMatch")}>
-                        <AntDesign name="pluscircleo" size={20} color="#fff" style={styles.icon} />
-                        <Text style={styles.ButtonText}>Add Match</Text>
-                    </TouchableOpacity>
-                </View>
+                {userLoggedIn && ( // Only show the "Add Match" button if the user is logged in
+                    <View style={styles.buttonContainer}>
+                        <TouchableOpacity style={styles.addButton} onPress={() => router.push("../matches/newMatch")}>
+                            <AntDesign name="pluscircleo" size={20} color="#fff" style={styles.icon} />
+                            <Text style={styles.ButtonText}>Add Match</Text>
+                        </TouchableOpacity>
+                    </View>
+                )}
 
                 {/* Display all current Matches */}
-
                 <Text style={styles.header}>Upcoming Matches</Text>
                 {matches.map((match: any) => (
                     <TouchableOpacity key={match._id} onPress={() => fetchMatch(match._id)}>

@@ -5,19 +5,21 @@ import { backButton } from './apiFunctions';
 import { router } from 'expo-router';
 
 const SignUpScreen = () => {
+    const [name, setName] = useState('');  // Add name state
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
     // Function to handle the sign-up
     const handleSignUp = async () => {
-        if (!username || !email || !password) {
+        if (!name || !username || !email || !password) {  // Include name in the check
             Alert.alert('Error', 'Please fill in all fields');
             return;
         }
 
         try {
             const formData = new URLSearchParams();
+            formData.append('name', name);  // Append name
             formData.append('username', username);
             formData.append('email', email);
             formData.append('password', password);
@@ -47,12 +49,8 @@ const SignUpScreen = () => {
                 // If it's an unknown type of error, show a generic message
                 Alert.alert('Error', 'Failed to sign up. Please try again.');
             }
-
         }
     };
-
-
-
 
     return (
         <SafeAreaView className="bg-white h-full">
@@ -68,7 +66,15 @@ const SignUpScreen = () => {
                         Lets get your account created.
                     </Text>
 
-                    {/* Username  */}
+                    {/* Name */}
+                    <TextInput
+                        value={name}
+                        onChangeText={setName}
+                        placeholder="Enter your full name"
+                        className="border-b-2 border-black my-4 p-2"
+                    />
+
+                    {/* Username */}
                     <TextInput
                         value={username}
                         onChangeText={setUsername}
@@ -76,7 +82,7 @@ const SignUpScreen = () => {
                         className="border-b-2 border-black my-4 p-2"
                     />
 
-                    {/* Email  */}
+                    {/* Email */}
                     <TextInput
                         value={email}
                         onChangeText={setEmail}
@@ -84,7 +90,7 @@ const SignUpScreen = () => {
                         className="border-b-2 border-black my-4 p-2"
                     />
 
-                    {/* Password  */}
+                    {/* Password */}
                     <TextInput
                         value={password}
                         onChangeText={setPassword}
@@ -118,4 +124,5 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
 });
+
 export default SignUpScreen;
