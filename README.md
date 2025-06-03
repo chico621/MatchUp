@@ -7,7 +7,8 @@
 ## 📱 Features
 
 - 🗓️ Schedule matches with other teams directly in-app  
-- 📍 View upcoming fixtures and match history  
+- 📍 View upcoming fixtures and match history
+- 🤳 In-app realtime messaging system
 - 📬 Notifications and status updates for confirmed, cancelled, or pending matches  
 - 🔍 Discover local teams open to friendlies  
 - 🧠 Simple, intuitive UI designed for youth coaches and managers  
