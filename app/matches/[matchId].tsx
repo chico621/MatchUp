@@ -13,7 +13,7 @@ const MatchDetails = () => {
     const [isAdmin, setIsAdmin] = useState<boolean>(false); // To check if user is admin
     const [loading, setLoading] = useState(true); // Loading state
 
-    const GOOGLE_MAPS_API_KEY = "AIzaSyAJlWtIahYjVCF3ti2cKfpYsPRRprMMmsY"; // API Key
+    const GOOGLE_MAPS_API_KEY = ""; // API Key
 
     useEffect(() => {
         if (!matchId || typeof matchId !== 'string') { // Check if matchId is valid
