@@ -1,6 +1,6 @@
 # ⚽ Matchup – Youth Football Scheduling App
 
-**Matchup** is a SaaS iOS application built with **Expo**, designed to simplify the process of organizing youth football matches. The app allows teams to arrange **preseason** and **friendly fixtures** directly with each other — completely removing the need for league integration or intermediaries.
+**Matchup** is a SaaS iOS application built with **Expo**, designed to simplify the process of organizing youth football matches. The app allows teams to arrange **preseason** and **friendly fixtures** directly with each other. Completely removing the need for league integration or intermediaries.
 
 ---
 
